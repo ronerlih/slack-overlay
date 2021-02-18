@@ -1,0 +1,31 @@
+{
+	"title": "slack overlay",
+	"name": "slack-overlay",
+	"version": "1.0.0",
+	"description": "slack overlay",
+	"productName": "slack overlay",
+	"author": "ronchuck",
+	"main": "main.js",
+	"build": {
+		"appId": "your.id",
+		"mac": {
+			"category": "your.app.category.type"
+		}
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "electron .",
+		"pack": "electron-builder --dir",
+		"dist": "electron-builder"
+	},
+	"keywords": [],
+	"license": "ISC",
+	"devDependencies": {
+		"electron": "^11.2.3",
+		"electron-builder": "^22.9.1"
+	},
+	"dependencies": {
+		"@material-ui/core": "^4.11.3",
+		"@material-ui/icons": "^4.11.2"
+	}
+}

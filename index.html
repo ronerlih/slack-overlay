@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+</head>
+<body style="background: rgba(80, 19, 203, 0.081); color: white; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+    <img alt="slack_logo" src="build/slack_logo.png" width=120/>
+    <p>brightness</p>
+    <input style="height: 4px;" type="range" min="0.01" max="70" value="0.081" id="brightness-slider">
+    <h4>ask the class channel</h4>
+    <p>
+        We are using node <script>document.write(process.versions.node)</script>,
+        Chrome <script>document.write(process.versions.chrome)</script>,
+        and Electron <script>document.write(process.versions.electron)</script>.
+    </p>
+
+    <script>
+       
+       const bodyStyle = document.body.style;
+       const sliderEl = document.querySelector("#brightness-slider");
+
+       sliderEl.oninput = function() {
+         bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`
+      }
+    </script>
+</body>
+</html>
