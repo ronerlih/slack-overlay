@@ -1,29 +1,71 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-</head>
-<body style="background: rgba(80, 19, 203, 0.081); color: white; font-family: Verdana, Geneva, Tahoma, sans-serif;">
-    <img alt="slack_logo" src="build/slack_logo.png" width=120/>
-    <p>brightness</p>
-    <input style="height: 4px;" type="range" min="0.01" max="70" value="0.081" id="brightness-slider">
-    <h4>ask the class channel</h4>
-    <p>
-        We are using node <script>document.write(process.versions.node)</script>,
-        Chrome <script>document.write(process.versions.chrome)</script>,
-        and Electron <script>document.write(process.versions.electron)</script>.
-    </p>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+		/>
+		<style>
+			::-webkit-scrollbar-track {
+				-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+				background-color: rgba(80, 19, 203, 0.345);
+			}
+			::-webkit-scrollbar-corner {
+				background: rgba(80, 19, 203, 0.645);
+			}
 
-    <script>
-       
-       const bodyStyle = document.body.style;
-       const sliderEl = document.querySelector("#brightness-slider");
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+				background-color: rgba(80, 19, 203, 0.345);
+			}
 
-       sliderEl.oninput = function() {
-         bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`
-      }
-    </script>
-</body>
+			::-webkit-scrollbar-thumb {
+				background-color: rgba(80, 19, 203, 0.345);
+				border: 2px solid rgba(80, 19, 203, 0.645);
+			}
+			
+		</style>
+	</head>
+	<body
+		style="
+			background: rgba(80, 19, 203, 0.345);
+			color: white;
+			font-family: Verdana, Geneva, Tahoma, sans-serif;
+		"
+	>
+		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle;" />
+		<div style="float: right">
+
+			<input
+				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle; "
+				type="range"
+				min="0.01"
+				max="100"
+				value="34.5"
+				step="0.001"
+				id="brightness-slider"
+			/>
+         <i
+         class="fas fa-adjust"
+         style="font-size: 14px; display: inline-block; vertical-align: middle; margin-left: -8px;"
+      >
+      </i></div>
+		<h4>ask the class channel</h4>
+
+		<script>
+			const bodyStyle = document.body.style;
+			const sliderEl = document.querySelector("#brightness-slider");
+
+			sliderEl.oninput = function () {
+				bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`;
+			};
+		</script>
+	</body>
 </html>
