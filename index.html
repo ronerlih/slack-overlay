@@ -30,7 +30,6 @@
 				background-color: rgba(80, 19, 203, 0.345);
 				border: 2px solid rgba(80, 19, 203, 0.645);
 			}
-			
 		</style>
 	</head>
 	<body
@@ -40,11 +39,10 @@
 			font-family: Verdana, Geneva, Tahoma, sans-serif;
 		"
 	>
-		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle;" />
+		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle" />
 		<div style="float: right">
-
 			<input
-				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle; "
+				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
 				type="range"
 				min="0.01"
 				max="100"
@@ -52,20 +50,41 @@
 				step="0.001"
 				id="brightness-slider"
 			/>
-         <i
-         class="fas fa-adjust"
-         style="font-size: 14px; display: inline-block; vertical-align: middle; margin-left: -8px;"
-      >
-      </i></div>
+			<i
+				class="fas fa-adjust"
+				style="
+					font-size: 14px;
+					display: inline-block;
+					vertical-align: middle;
+					margin-left: -8px;
+				"
+			>
+			</i>
+		</div>
 		<h4>ask the class channel</h4>
+
+		<!-- socketio -->
+		<script src="build/socketio.js"></script>
 
 		<script>
 			const bodyStyle = document.body.style;
 			const sliderEl = document.querySelector("#brightness-slider");
+			const authEl = document.querySelector("#authenticate");
 
+			// SLIDER
 			sliderEl.oninput = function () {
 				bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`;
 			};
+
+			// socketIO
+			const socket = io("https://slack-overlay-service.herokuapp.com/");
+
+			socket.on("connect", () => {
+				console.log("conected");
+			});
+			socket.on("broadcast", newMessage => {
+            console.log(newMessage)
+			});
 		</script>
 	</body>
 </html>

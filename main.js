@@ -1,5 +1,9 @@
-const { app, BrowserWindow, screen, nativeImage } = require("electron");
+// env vars
+require("dotenv").config();
+
+const { app, BrowserWindow, screen, nativeImage, shell } = require("electron");
 const SCREEN_WIDTH = 600;
+process.openExternal = shell.openExternal;
 
 function createWindow() {
 	const win = new BrowserWindow({
@@ -25,7 +29,7 @@ function createWindow() {
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
-   // win.webContents.openDevTools()
+   win.webContents.openDevTools()
 }
 
 // set icon for mac
