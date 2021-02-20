@@ -12,6 +12,9 @@
 			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
 		/>
 		<style>
+			html {
+				scroll-behavior: smooth;
+			}
 			::-webkit-scrollbar-track {
 				-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 				background-color: rgba(80, 19, 203, 0.345);
@@ -40,7 +43,7 @@
 		"
 	>
 		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle" />
-		<div style="float: right">
+		<div style="position: fixed; top: 10px; right:5px">
 			<input
 				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
 				type="range"
@@ -62,6 +65,7 @@
 			</i>
 		</div>
 		<h4>ask the class channel</h4>
+		<div id="threads"></div>
 
 		<!-- socketio -->
 		<script src="build/socketio.js"></script>
@@ -69,12 +73,104 @@
 		<script>
 			const bodyStyle = document.body.style;
 			const sliderEl = document.querySelector("#brightness-slider");
-			const authEl = document.querySelector("#authenticate");
+			const threadsEl = document.querySelector("#threads");
+
+			const rootThreads = {};
+
+			const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
+			let users = {};
 
 			// SLIDER
 			sliderEl.oninput = function () {
 				bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`;
 			};
+
+			// fetch users
+			fetch("https://slack.com/api/users.list", slackOptions)
+				.then((response) => response.json())
+				.then((usersList) => {
+					return usersList.members.reduce((members, current) => {
+						return {
+							...members,
+							[current.id]: {
+								name: current.name,
+								avatar: current.profile.image_512,
+							},
+						};
+					}, {});
+				})
+				.then((members) => {
+					users = members;
+				})
+
+				// fetch history
+				.then(() =>
+					fetch(
+						`https://slack.com/api/conversations.history?inclusive=true&channel=${process.env.channel}`,
+						slackOptions
+					)
+				)
+				.then((response) => response.json())
+				.then((historyThread) => {
+					console.log(historyThread);
+					historyThread.messages.reverse().map((thread) => {
+						if (thread.type === "message") {
+							threadsEl.appendChild(newMessage(thread));
+						}
+					});
+
+				})
+            .then(() => {
+               setTimeout(() => window.scrollTo(0,document.body.clientHeight), 1000);
+            })
+
+			function newMessage(message, isReply) {
+				// create element
+				const messageContainerEl = document.createElement("div");
+				const messageEl = document.createElement("div");
+            messageContainerEl.appendChild(messageEl);
+
+				messageEl.textContent = message.text;
+				messageEl.style.borderTop = "solid 1px teal";
+				messageEl.style.marginTop = "10px";
+				messageEl.style.display = "inline-block";
+
+				// reply style
+				isReply 
+               ? (messageEl.style.marginLeft = "10px") 
+               : (messageEl.style.marginTop = "20px");
+
+				// reactions
+				if (message.reactions && message.reactions.length > 0) {
+					message.reactions.forEach((reaction) => {
+						// messageEl.appendChild(newMessage(reaction));
+					});
+				}
+
+				// get thread
+				if (message.thread_ts && !rootThreads[message.thread_ts]) {
+					rootThreads[message.thread_ts] = true;
+
+					fetch(
+						`https://slack.com/api/conversations.replies?inclusive=true&channel=${process.env.channel}&ts=${message.thread_ts}`,
+						slackOptions
+					)
+						.then((response) => response.json())
+						.then((completeThread) => {
+							completeThread.messages.map((block) => {
+								messageContainerEl.appendChild(newMessage(block, true));
+							});
+						});
+				}
+
+				return messageContainerEl;
+			}
+			// files: [{…}]
+			// reactions: (2) [{…}, {…}]
+			// reply_count: 2
+			// text: "mountain"
+			// type: "message"
+			// user: "U01NMR2RSMT"
 
 			// socketIO
 			const socket = io("https://slack-overlay-service.herokuapp.com/");
@@ -82,8 +178,8 @@
 			socket.on("connect", () => {
 				console.log("conected");
 			});
-			socket.on("broadcast", newMessage => {
-            console.log(newMessage)
+			socket.on("broadcast", (newMessage) => {
+				console.log(newMessage);
 			});
 		</script>
 	</body>
