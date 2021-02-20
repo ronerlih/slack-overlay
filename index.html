@@ -42,8 +42,11 @@
 			font-family: Verdana, Geneva, Tahoma, sans-serif;
 		"
 	>
+   <header style="position: fixed; top: 10px; right:5px; background-color: rgba(80, 19, 203, 0.845); padding: 6px; border: 1px solid white">
+
 		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle" />
-		<div style="position: fixed; top: 10px; right:5px">
+      <span><em>overlay</em></span>
+		<div style="float: right;">
 			<input
 				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
 				type="range"
@@ -64,6 +67,8 @@
 			>
 			</i>
 		</div>
+   </header>
+
 		<h4>ask the class channel</h4>
 		<div id="threads"></div>
 
@@ -124,14 +129,44 @@
                setTimeout(() => window.scrollTo(0,document.body.clientHeight), 1000);
             })
 
-			function newMessage(message, isReply) {
+            async function newFile(file, isReply){
+               const response = await fetch(file.url_private, slackOptions);
+               const image = await response.blob()
+               // Then create a local URL for that image and print it 
+               publicUrl = URL.createObjectURL(image)
+               console.log(publicUrl)
+               const imgEl = document.createElement("img");
+
+               imgEl.setAttribute('data-zoom', 'false');
+               imgEl.onclick = function () {
+                  if(this.dataset.zoom === 'false'){
+                     this.setAttribute('data-zoom', 'true');
+                     this.style.width = "100%";
+                  } else {
+                     this.setAttribute('data-zoom', 'false');
+                     this.style.width = "50%";
+                  }
+               }
+               if (isReply) imgEl.style.marginLeft = "10px";
+               imgEl.src = publicUrl;
+               imgEl.alt = "file";
+               imgEl.style.width = "50%";
+               imgEl.style.marginTop = "10px";
+               imgEl.style.transition="all 0.5s ease-out"
+               imgEl.style.border = "1px solid #1cb7a2"
+
+               imgEl.style.display = "block";
+               return imgEl;
+            }
+
+			 function newMessage(message, isReply) {
 				// create element
 				const messageContainerEl = document.createElement("div");
 				const messageEl = document.createElement("div");
             messageContainerEl.appendChild(messageEl);
 
 				messageEl.textContent = message.text;
-				messageEl.style.borderTop = "solid 1px teal";
+				messageEl.style.borderTop = "solid 2px #1cb7a2";
 				messageEl.style.marginTop = "10px";
 				messageEl.style.display = "inline-block";
 
@@ -146,6 +181,13 @@
 						// messageEl.appendChild(newMessage(reaction));
 					});
 				}
+
+            // files
+            if(message.files){
+
+               message.files.forEach(async file => messageContainerEl.appendChild((await newFile(file, rootThreads[message.thread_ts]))))
+               
+            }
 
 				// get thread
 				if (message.thread_ts && !rootThreads[message.thread_ts]) {
