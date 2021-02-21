@@ -120,7 +120,6 @@
 				)
 				.then((response) => response.json())
 				.then((historyThread) => {
-					console.log(historyThread);
 					historyThread.messages.reverse().map((thread) => {
 						if (thread.type === "message") {
 							threadsEl.appendChild(newMessage(thread));
@@ -137,7 +136,6 @@
                const image = await response.blob()
                // Then create a local URL for that image and print it 
                publicUrl = URL.createObjectURL(image)
-               console.log(publicUrl)
                const imgEl = document.createElement("img");
 
                imgEl.setAttribute('data-zoom', 'false');
@@ -167,10 +165,46 @@
 			 function newMessage(message, isReply) {
 				// create element
 				const messageContainerEl = document.createElement("div");
-				const messageEl = document.createElement("div");
-            messageContainerEl.appendChild(messageEl);
+				messageContainerEl.columnCount = 2;
 
-				messageEl.textContent = message.text;
+            const messageEl = document.createElement("div");
+            
+            // avatar
+            const userEl = document.createElement('div');
+            const avatarEl = document.createElement('img');
+            const userNameEl = document.createElement('div');
+            avatarEl.src = users[message.user].avatar;
+            avatarEl.width = 30;
+            avatarEl.style.display = "inline-block";
+            avatarEl.style.border = "solid 1px #1cb7a2";
+            avatarEl.style.borderRadius = "2px";
+            avatarEl.style.lineHeight = "100%";
+            avatarEl.style.verticalAlign = "top";
+            
+            userNameEl.textContent = users[message.user].name;
+            userNameEl.style.display = "inline-block";
+            userNameEl.style.fontWeight = "600";
+            userNameEl.style.marginBottom = "5px";
+
+            userNameEl.style.verticalAlign = "top";
+
+            // userEl.appendChild(userNameEl);
+
+            // main div and text
+            messageContainerEl.appendChild(messageEl);
+            messageEl.appendChild(avatarEl);
+
+            const messageWrapEl = document.createElement('div');
+            const messageTextEl = document.createElement('div');
+				messageWrapEl.style.display = "inline-block";
+            messageWrapEl.style.width = "calc(100% - 50px)";
+            messageWrapEl.style.marginLeft = "5px";
+
+				messageTextEl.textContent = message.text;
+            messageWrapEl.appendChild(userNameEl);
+            messageWrapEl.appendChild(messageTextEl);
+            messageEl.appendChild(messageWrapEl);
+
 				messageEl.style.border = "solid 1px #1cb7a2";
             isReply ? messageEl.style.border = "solid 1px #fcb7a2": messageEl.style.border = "solid 1px #1cb7a2"
 
