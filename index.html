@@ -57,7 +57,7 @@
 				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
 				type="range"
 				min="0.01"
-				max="100"
+				max="99"
 				value="20"
 				step="0.001"
 				id="brightness-slider"
@@ -99,7 +99,6 @@
 
          bgSelection.forEach(elem => {
             elem.style.cursor = "pointer";
-            console.log(elem.dataset.color)
             console.log("rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")")
             // bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
             elem.onclick = function() { bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")"};
@@ -112,9 +111,8 @@
 
 			// SLIDER
 			sliderEl.oninput = function (e) {
-            backgroundOpacity = e.target.value / 100;
+            backgroundOpacity = (e.target.value / 100);
             bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
-            console.log(bodyStyle.background )
          };
 
 			// fetch users
@@ -199,7 +197,7 @@
             avatarEl.src = users[message.user].avatar;
             avatarEl.width = 30;
             avatarEl.style.display = "inline-block";
-            avatarEl.style.border = "solid 1px #1cb7a2";
+            isReply ? avatarEl.style.border = "solid 1px #b213cb": avatarEl.style.border = "solid 1px #1cb7a2"
             avatarEl.style.borderRadius = "2px";
             avatarEl.style.lineHeight = "100%";
             avatarEl.style.verticalAlign = "top";
