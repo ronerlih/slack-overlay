@@ -91,12 +91,16 @@
 		<script src="build/socketio.js"></script>
 
 		<script>
-			const bodyStyle = document.body.style;
-			const sliderEl = document.querySelector("#brightness-slider");
+         const sliderEl = document.querySelector("#brightness-slider");
 			const threadsEl = document.querySelector("#threads");
          const bgSelection = document.querySelectorAll(".bg-selection");
+			const bodyStyle = document.body.style;
+         const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
          let backgroundOpacity = 0.234;
+         const rootThreads = {};
+			let users = {};
 
+         // event handlers
          bgSelection.forEach(elem => {
             elem.style.cursor = "pointer";
             console.log("rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")")
@@ -104,12 +108,8 @@
             elem.onclick = function() { bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")"};
          })
 
-         const rootThreads = {};
-
-			const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
-			let users = {};
-
 			// SLIDER
+         sliderEl.value = backgroundOpacity
 			sliderEl.oninput = function (e) {
             backgroundOpacity = (e.target.value / 100);
             bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
@@ -258,11 +258,8 @@
 				}
 
             // files
-            if(message.files){
-
+            if(message.files)
                message.files.forEach(async file => messageContainerEl.appendChild((await newFile(file, rootThreads[message.thread_ts]))))
-               
-            }
 
 				// get thread
 				if (message.thread_ts && !rootThreads[message.thread_ts]) {
@@ -282,13 +279,7 @@
 
 				return messageContainerEl;
 			}
-			// files: [{…}]
-			// reactions: (2) [{…}, {…}]
-			// reply_count: 2
-			// text: "mountain"
-			// type: "message"
-			// user: "U01NMR2RSMT"
-
+	
 			// socketIO
 			const socket = io("https://slack-overlay-service.herokuapp.com/");
 
