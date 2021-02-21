@@ -27,7 +27,7 @@ function createWindow() {
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
-   // win.webContents.openDevTools()
+   win.webContents.openDevTools()
 }
 
 // set icon for mac

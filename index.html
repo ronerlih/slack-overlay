@@ -40,6 +40,7 @@
 			background: rgba(80, 19, 203, 0.345);
 			color: white;
 			font-family: Verdana, Geneva, Tahoma, sans-serif;
+         margin: 10px;
 		"
 	>
    <header style="position: fixed; top: 10px; right:5px; background-color: rgba(80, 19, 203, 0.845); padding: 6px; border: 1px solid white">
@@ -72,6 +73,8 @@
 		<h4>ask the class channel</h4>
 		<div id="threads"></div>
 
+      <!-- emojilist -->
+      <script src="build/emoji_list.js"></script>
 		<!-- socketio -->
 		<script src="build/socketio.js"></script>
 
@@ -147,13 +150,15 @@
                      this.style.width = "50%";
                   }
                }
-               if (isReply) imgEl.style.marginLeft = "10px";
                imgEl.src = publicUrl;
                imgEl.alt = "file";
                imgEl.style.width = "50%";
+               imgEl.style.borderRadius = "2px";
                imgEl.style.marginTop = "10px";
                imgEl.style.transition="all 0.5s ease-out"
-               imgEl.style.border = "1px solid #1cb7a2"
+               // imgEl.style.border = "2px solid #1cb7a2"
+               isReply ? imgEl.style.border = "solid 1px #fcb7a2": imgEl.style.border = "solid 1px #1cb7a2"
+
 
                imgEl.style.display = "block";
                return imgEl;
@@ -166,19 +171,35 @@
             messageContainerEl.appendChild(messageEl);
 
 				messageEl.textContent = message.text;
-				messageEl.style.borderTop = "solid 2px #1cb7a2";
+				messageEl.style.border = "solid 1px #1cb7a2";
+            isReply ? messageEl.style.border = "solid 1px #fcb7a2": messageEl.style.border = "solid 1px #1cb7a2"
+
 				messageEl.style.marginTop = "10px";
 				messageEl.style.display = "inline-block";
+            // isReply ? messageEl.style.background = "#5639caad" : messageEl.style.background = "#5639caad"
+            ;
+            messageEl.style.background = "#5639caad"
+            messageEl.style.padding = "5px";
+            messageEl.style.borderRadius = "2px";
+            messageEl.style.boxShadow = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
 
-				// reply style
+            // reply style
 				isReply 
-               ? (messageEl.style.marginLeft = "10px") 
-               : (messageEl.style.marginTop = "20px");
+               ? (messageContainerEl.style.marginLeft = "10px") 
+               : (messageContainerEl.style.marginTop = "20px");
 
 				// reactions
 				if (message.reactions && message.reactions.length > 0) {
-					message.reactions.forEach((reaction) => {
-						// messageEl.appendChild(newMessage(reaction));
+               const reactionContainerEl = document.createElement('div');
+
+               message.reactions.forEach((reaction) => {
+                  const reactionEl = document.createElement('div');
+                  reactionContainerEl.appendChild(reactionEl);
+                 
+                  reactionEl.textContent = emojis[":"+reaction.name+":"]
+                  reactionEl.style.display = "inline"
+                  reactionEl.style.margin = "2px";
+						messageContainerEl.appendChild(reactionContainerEl);
 					});
 				}
 
