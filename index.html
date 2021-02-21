@@ -3,263 +3,251 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-		/>
-		<link
-			rel="stylesheet"
-			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
-		/>
-		<style>
-			html {
-				scroll-behavior: smooth;
-			}
-			::-webkit-scrollbar-track {
-				-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-				background-color: hsla(260, 83%, 44%, 0.345);
-			}
-			::-webkit-scrollbar-corner {
-            background:rgba(80, 19, 203, 0.345);
-            background:rgba(0, 0, 0, 0.345);
-            background:rgba(255, 255, 255, 0.345);
-				background: rgba(80, 19, 203, 0.645);
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
 
-			}
-
-			::-webkit-scrollbar {
-				width: 6px;
-				height: 6px;
-				background-color: rgba(80, 19, 203, 0.345);
-			}
-
-			::-webkit-scrollbar-thumb {
-				background-color: rgba(80, 19, 203, 0.345);
-				border: 2px solid #5013cb;
-			}
-		</style>
+		<!-- local css -->
+		<link rel="stylesheet" href="build/assets/css/style.css" />
 	</head>
-	<body
-		style="
-			/* background: #5013cb58; */
-			background: rgba(0, 0, 0, 0.345);
-			color: white;
-			font-family: Verdana, Geneva, Tahoma, sans-serif;
-         margin: 10px;
-		"
-	>
-   <header style="position: fixed; top: 10px; right:5px; background-color: rgba(80, 19, 203, 0.845); padding: 6px; border: 1px solid white">
-
-		<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle" />
-      <span><em>overlay</em></span>
-		<div style="float: right;">
-			<input
-				style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
-				type="range"
-				min="0.01"
-				max="99"
-				value="20"
-				step="0.001"
-				id="brightness-slider"
-			/>
-			<i
-				class="fas fa-adjust"
-				style="
-					font-size: 14px;
-					display: inline-block;
-					vertical-align: middle;
-					margin-left: -8px;
-				"
-			>
-			</i>
-		</div>
-      <div>
-         <div>
-            <a class="bg-selection" data-color="rgba(80, 19, 203, 0.345)"><i class="fas fa-circle" style="color:rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i></a>
-            <a class="bg-selection" data-color="rgba(0, 0, 0, 0.345)"><i class="fas fa-circle" style="color:black; -webkit-text-stroke: 1px white"></i></a>
-            <a class="bg-selection" data-color="rgba(255, 255, 255, 0.345)"><i class="fas fa-circle" style="color:white; -webkit-text-stroke: 1px black"></i></a>
-         </div>
-      </div>
-   </header>
+	<body style="background: rgba(0, 0, 0, 0.345)">
+		<header>
+			<img alt="slack_logo" src="build/slack_logo.png" width="70" style="vertical-align: middle" />
+			<span><em>overlay</em></span>
+			<div style="float: right">
+				<input
+					style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
+					type="range"
+					min="0.01"
+					max="99"
+					value="20"
+					step="0.001"
+					id="brightness-slider"
+				/>
+				<i class="fas fa-adjust" style="font-size: 14px; display: inline-block; vertical-align: middle; margin-left: -8px"> </i>
+			</div>
+			<div>
+				<div>
+					<a class="bg-selection" data-color="rgba(80, 19, 203, 0.345)"
+						><i class="fas fa-circle" style="color: rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i
+					></a>
+					<a class="bg-selection" data-color="rgba(0, 0, 0, 0.345)"
+						><i class="fas fa-circle" style="color: black; -webkit-text-stroke: 1px white"></i
+					></a>
+					<a class="bg-selection" data-color="rgba(255, 255, 255, 0.345)"
+						><i class="fas fa-circle" style="color: white; -webkit-text-stroke: 1px black"></i
+					></a>
+				</div>
+			</div>
+		</header>
 
 		<h4>ask the class channel</h4>
 		<div id="threads"></div>
 
-      <!-- emojilist -->
-      <script src="build/emoji_list.js"></script>
+		<!-- emojilist -->
+		<script src="build/emoji_list.js"></script>
+
 		<!-- socketio -->
 		<script src="build/socketio.js"></script>
 
+		<!-- logic -->
 		<script>
-         const sliderEl = document.querySelector("#brightness-slider");
+			const usersEndPoint = "https://slack.com/api/users.list";
+			const conversationHistoryEndPoint = `https://slack.com/api/conversations.history?inclusive=true&channel=${process.env.channel}`;
+
+			const sliderEl = document.querySelector("#brightness-slider");
 			const threadsEl = document.querySelector("#threads");
-         const bgSelection = document.querySelectorAll(".bg-selection");
+			const bgSelection = document.querySelectorAll(".bg-selection");
 			const bodyStyle = document.body.style;
-         const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
-         let backgroundOpacity = 0.234;
-         const rootThreads = {};
+			const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
+			let backgroundOpacity = 0.234;
+			const rootThreads = {};
 			let users = {};
 
-         // event handlers
-         bgSelection.forEach(elem => {
-            elem.style.cursor = "pointer";
-            console.log("rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")")
-            // bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
-            elem.onclick = function() { bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")"};
-         })
+			// event handlers
+			setupEventHandlers();
 
 			// SLIDER
-         sliderEl.value = backgroundOpacity
-			sliderEl.oninput = function (e) {
-            backgroundOpacity = (e.target.value / 100);
-            bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
-         };
+			setupSlider();
 
-			// fetch users
-			fetch("https://slack.com/api/users.list", slackOptions)
-				.then((response) => response.json())
-				.then((usersList) => {
-					return usersList.members.reduce((members, current) => {
-						return {
-							...members,
-							[current.id]: {
-								name: current.name,
-								avatar: current.profile.image_512,
-							},
-						};
-					}, {});
-				})
-				.then((members) => {
-					users = members;
-				})
+         // 🚀 start on startup or event trigger 
+         trigger();
 
-				// fetch history
-				.then(() =>
-					fetch(
-						`https://slack.com/api/conversations.history?inclusive=true&channel=${process.env.channel}`,
-						slackOptions
-					)
-				)
-				.then((response) => response.json())
-				.then((historyThread) => {
-					historyThread.messages.reverse().map((thread) => {
-						if (thread.type === "message") {
-							threadsEl.appendChild(newMessage(thread));
-						}
+         // 🚀 start on startup or event trigger 
+         async function trigger(){
+            
+            // fetch users
+            await fetchUsers();
+				
+            // fetch history
+            await fetchHistory();
+         }
+
+			
+         function setupEventHandlers() {
+				// event handlers
+				bgSelection.forEach((elem) => {
+					elem.style.cursor = "pointer";
+					console.log("rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")");
+					// bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
+					elem.onclick = function () {
+						bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")";
+					};
+				});
+			}
+
+			function setupSlider() {
+				sliderEl.value = backgroundOpacity;
+
+				sliderEl.oninput = function (e) {
+					console.log(bodyStyle.background);
+					backgroundOpacity = e.target.value / 100;
+					console.log("rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")");
+					bodyStyle.background =
+						"rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")";
+					"rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")";
+				};
+			}
+
+			function fetchHistory() {
+				fetch(conversationHistoryEndPoint, slackOptions)
+					.then((response) => response.json())
+					.then((historyThread) => {
+						historyThread.messages.reverse().map((thread) => {
+							if (thread.type === "message") {
+								threadsEl.appendChild(newMessage(thread));
+							}
+						});
+					})
+					.then(() => {
+						setTimeout(scrollToBottom, 1000);
 					});
+			}
 
-				})
-            .then(() => {
-               setTimeout(() => window.scrollTo(0,document.body.clientHeight), 1000);
-            })
+         function scrollToBottom () {
+             window.scrollTo(0, document.body.clientHeight)
+         }
+			function fetchUsers() {
+				return fetch(usersEndPoint, slackOptions)
+					.then((response) => response.json())
+					.then((usersList) => {
+						return usersList.members.reduce((members, current) => {
+							return {
+								...members,
+								[current.id]: {
+									name: current.name,
+									avatar: current.profile.image_512,
+								},
+							};
+						}, {});
+					})
+					.then((members) => {
+						users = members;
+					});
+			}
 
-            async function newFile(file, isReply){
-               const response = await fetch(file.url_private, slackOptions);
-               const image = await response.blob()
-               // Then create a local URL for that image and print it 
-               publicUrl = URL.createObjectURL(image)
-               const imgEl = document.createElement("img");
+			async function newFile(file, isReply) {
+				const response = await fetch(file.url_private, slackOptions);
+				const image = await response.blob();
+				// Then create a local URL for that image and print it
+				publicUrl = URL.createObjectURL(image);
+				const imgEl = document.createElement("img");
 
-               imgEl.setAttribute('data-zoom', 'false');
-               imgEl.onclick = function () {
-                  if(this.dataset.zoom === 'false'){
-                     this.setAttribute('data-zoom', 'true');
-                     this.style.width = "50%";
-                  } else {
-                     this.setAttribute('data-zoom', 'false');
-                     this.style.width = "100%";
-                  }
-               }
-               imgEl.src = publicUrl;
-               imgEl.alt = "file";
-               imgEl.style.width = "50%";
+				imgEl.setAttribute("data-zoom", "false");
+				imgEl.onclick = function () {
+					if (this.dataset.zoom === "false") {
+						this.setAttribute("data-zoom", "true");
+						this.style.width = "50%";
+					} else {
+						this.setAttribute("data-zoom", "false");
+						this.style.width = "100%";
+					}
+				};
 
-               imgEl.style.borderRadius = "2px";
-               imgEl.style.marginTop = "10px";
-               imgEl.style.transition="all 0.5s ease-out"
-               // imgEl.style.border = "2px solid #1cb7a2"
-               isReply ? imgEl.style.border = "solid 1px #b213cb": imgEl.style.border = "solid 1px #1cb7a2"
+				imgEl.src = publicUrl;
+				imgEl.alt = "file";
+				imgEl.style.width = "50%";
 
+				imgEl.style.borderRadius = "2px";
+				imgEl.style.marginTop = "10px";
+				imgEl.style.transition = "all 0.5s ease-out";
+				// imgEl.style.border = "2px solid #1cb7a2"
+				isReply ? (imgEl.style.border = "solid 1px #b213cb") : (imgEl.style.border = "solid 1px #1cb7a2");
 
-               imgEl.style.display = "block";
-               return imgEl;
-            }
+				imgEl.style.display = "block";
+				return imgEl;
+			}
 
-			 function newMessage(message, isReply) {
+			function newMessage(message, isReply) {
 				// create element
 				const messageContainerEl = document.createElement("div");
-            const messageEl = document.createElement("div");
+				const messageEl = document.createElement("div");
 
-            // avatar
-            const userEl = document.createElement('div');
-            const avatarEl = document.createElement('img');
-            const userNameEl = document.createElement('div');
-            avatarEl.src = users[message.user].avatar;
-            avatarEl.width = 30;
-            avatarEl.style.display = "inline-block";
-            isReply ? avatarEl.style.border = "solid 1px #b213cb": avatarEl.style.border = "solid 1px #1cb7a2"
-            avatarEl.style.borderRadius = "2px";
-            avatarEl.style.lineHeight = "100%";
-            avatarEl.style.verticalAlign = "top";
-            
-            // username + date
-            userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>` ;
-            userNameEl.style.display = "inline-block";
-            userNameEl.style.marginBottom = "5px";
-            userNameEl.style.verticalAlign = "top";
+				// avatar
+				const userEl = document.createElement("div");
+				const avatarEl = document.createElement("img");
+				const userNameEl = document.createElement("div");
+				avatarEl.src = users[message.user].avatar;
+				avatarEl.width = 30;
+				avatarEl.style.display = "inline-block";
+				isReply ? (avatarEl.style.border = "solid 1px #b213cb") : (avatarEl.style.border = "solid 1px #1cb7a2");
+				avatarEl.style.borderRadius = "2px";
+				avatarEl.style.lineHeight = "100%";
+				avatarEl.style.verticalAlign = "top";
 
-            
-            console.log()
-            // main div and text
-            messageContainerEl.appendChild(messageEl);
-            messageEl.appendChild(avatarEl);
+				// username + date
+				userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>`;
+				userNameEl.style.display = "inline-block";
+				userNameEl.style.marginBottom = "5px";
+				userNameEl.style.verticalAlign = "top";
 
-            const messageWrapEl = document.createElement('div');
-            const messageTextEl = document.createElement('div');
+				console.log();
+				// main div and text
+				messageContainerEl.appendChild(messageEl);
+				messageEl.appendChild(avatarEl);
+
+				const messageWrapEl = document.createElement("div");
+				const messageTextEl = document.createElement("div");
 				messageWrapEl.style.display = "inline-block";
-            messageWrapEl.style.width = "calc(100% - 50px)";
-            messageWrapEl.style.marginLeft = "5px";
+				messageWrapEl.style.width = "calc(100% - 50px)";
+				messageWrapEl.style.marginLeft = "5px";
 
 				messageTextEl.textContent = message.text;
-            messageWrapEl.appendChild(userNameEl);
-            messageWrapEl.appendChild(messageTextEl);
-            messageEl.appendChild(messageWrapEl);
+				messageWrapEl.appendChild(userNameEl);
+				messageWrapEl.appendChild(messageTextEl);
+				messageEl.appendChild(messageWrapEl);
 
 				messageEl.style.border = "solid 1px #1cb7a2";
-            isReply ? messageEl.style.border = "solid 1px #b213cb": messageEl.style.border = "solid 1px #1cb7a2"
+				isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
 
 				messageEl.style.marginTop = "10px";
 				messageEl.style.display = "block";
-            // isReply ? messageEl.style.background = "#5639caad" : messageEl.style.background = "#5639caad"
-            ;
-            messageEl.style.background = "#5639caad"
-            messageEl.style.padding = "5px";
-            messageEl.style.borderRadius = "2px";
-            messageEl.style.boxShadow = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
+				// isReply ? messageEl.style.background = "#5639caad" : messageEl.style.background = "#5639caad"
+				messageEl.style.background = "#5639caad";
+				messageEl.style.padding = "5px";
+				messageEl.style.borderRadius = "2px";
+				messageEl.style.boxShadow = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
 
-            // reply style
-				isReply 
-               ? (messageContainerEl.style.marginLeft = "10px") 
-               : (messageContainerEl.style.marginTop = "20px");
+				// reply style
+				isReply ? (messageContainerEl.style.marginLeft = "10px") : (messageContainerEl.style.marginTop = "20px");
 
 				// reactions
 				if (message.reactions && message.reactions.length > 0) {
-               const reactionContainerEl = document.createElement('div');
+					const reactionContainerEl = document.createElement("div");
 
-               message.reactions.forEach((reaction) => {
-                  const reactionEl = document.createElement('div');
-                  reactionContainerEl.appendChild(reactionEl);
-                 
-                  reactionEl.textContent = emojis[":"+reaction.name+":"]
-                  reactionEl.style.display = "inline"
-                  reactionEl.style.margin = "2px";
+					message.reactions.forEach((reaction) => {
+						const reactionEl = document.createElement("div");
+						reactionContainerEl.appendChild(reactionEl);
+
+						reactionEl.textContent = emojis[":" + reaction.name + ":"];
+						reactionEl.style.display = "inline";
+						reactionEl.style.margin = "2px";
 						messageContainerEl.appendChild(reactionContainerEl);
 					});
 				}
 
-            // files
-            if(message.files)
-               message.files.forEach(async file => messageContainerEl.appendChild((await newFile(file, rootThreads[message.thread_ts]))))
+				// files
+				if (message.files)
+					message.files.forEach(async (file) => messageContainerEl.appendChild(await newFile(file, rootThreads[message.thread_ts])));
 
 				// get thread
 				if (message.thread_ts && !rootThreads[message.thread_ts]) {
@@ -279,32 +267,35 @@
 
 				return messageContainerEl;
 			}
-	
+
 			// socketIO
 			const socket = io("https://slack-overlay-service.herokuapp.com/");
 
 			socket.on("connect", () => {
 				console.log("conected");
 			});
-			socket.on("broadcast", (newMessage) => {
-				console.log(newMessage);
+			socket.on("broadcast", (msg) => {
+				console.log(msg);
+            threadsEl.appendChild(newMessage(msg.event));
+            scrollToBottom();
 			});
-         function timeStampToDate(ts) {
-            let unix_timestamp = 1549312452
-            // Create a new JavaScript Date object based on the timestamp
-            // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-            var date = new Date(unix_timestamp * 1000);
-            // Hours part from the timestamp
-            var hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours() ;
 
-            // Minutes part from the timestamp
-            var minutes = "0" + date.getMinutes() ;
+			function timeStampToDate(ts) {
+				let unix_timestamp = 1549312452;
+				// Create a new JavaScript Date object based on the timestamp
+				// multiplied by 1000 so that the argument is in milliseconds, not seconds.
+				var date = new Date(unix_timestamp * 1000);
+				// Hours part from the timestamp
+				var hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
 
-            // Will display time in 10:30:23 format
-            var formattedTime = hours + ':' + minutes.substr(-2) + (date.getHours() > 12 ? "pm" : "am");
+				// Minutes part from the timestamp
+				var minutes = "0" + date.getMinutes();
 
-            return formattedTime;
-         }
+				// Will display time in 10:30:23 format
+				var formattedTime = hours + ":" + minutes.substr(-2) + (date.getHours() > 12 ? "pm" : "am");
+
+				return formattedTime;
+			}
 		</script>
 	</body>
 </html>
