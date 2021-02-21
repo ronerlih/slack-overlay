@@ -20,7 +20,11 @@
 				background-color: hsla(260, 83%, 44%, 0.345);
 			}
 			::-webkit-scrollbar-corner {
+            background:rgba(80, 19, 203, 0.345);
+            background:rgba(0, 0, 0, 0.345);
+            background:rgba(255, 255, 255, 0.345);
 				background: rgba(80, 19, 203, 0.645);
+
 			}
 
 			::-webkit-scrollbar {
@@ -71,9 +75,9 @@
 		</div>
       <div>
          <div>
-            <a class="bg-selection" data-color="#5013cb58"><i class="fas fa-circle" style="color:rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i></a>
-            <a class="bg-selection" data-color="#00000058"><i class="fas fa-circle" style="color:black; -webkit-text-stroke: 1px white"></i></a>
-            <a class="bg-selection" data-color="#FFFFFF58"><i class="fas fa-circle" style="color:white; -webkit-text-stroke: 1px black"></i></a>
+            <a class="bg-selection" data-color="rgba(80, 19, 203, 0.345)"><i class="fas fa-circle" style="color:rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i></a>
+            <a class="bg-selection" data-color="rgba(0, 0, 0, 0.345)"><i class="fas fa-circle" style="color:black; -webkit-text-stroke: 1px white"></i></a>
+            <a class="bg-selection" data-color="rgba(255, 255, 255, 0.345)"><i class="fas fa-circle" style="color:white; -webkit-text-stroke: 1px black"></i></a>
          </div>
       </div>
    </header>
@@ -91,19 +95,25 @@
 			const sliderEl = document.querySelector("#brightness-slider");
 			const threadsEl = document.querySelector("#threads");
          const bgSelection = document.querySelectorAll(".bg-selection");
+         let backgroundOpacity = 0.234;
+
          bgSelection.forEach(elem => {
             elem.style.cursor = "pointer";
-            elem.onclick = function() { document.body.style.background = this.dataset.color}});
-			const rootThreads = {};
+            console.log(elem.dataset.color)
+            console.log("rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")")
+            // bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
+            elem.onclick = function() { bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(',') + 1  ) + backgroundOpacity + ")"};
+         })
+
+         const rootThreads = {};
 
 			const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
 			let users = {};
 
 			// SLIDER
 			sliderEl.oninput = function (e) {
-            console.log("rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + (e.target.value / 100) + ")")
-				// bodyStyle.background = bodyStyle.background.slice(0,-2) +  (this.value / 100).toString(16);
-            bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + (e.target.value / 100) + ")";
+            backgroundOpacity = e.target.value / 100;
+            bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + backgroundOpacity + ")";
             console.log(bodyStyle.background )
          };
 
@@ -156,15 +166,16 @@
                imgEl.onclick = function () {
                   if(this.dataset.zoom === 'false'){
                      this.setAttribute('data-zoom', 'true');
-                     this.style.height = "calc(100vh - 25px)";
+                     this.style.width = "50%";
                   } else {
                      this.setAttribute('data-zoom', 'false');
-                     this.style.height = "50vh";
+                     this.style.width = "100%";
                   }
                }
                imgEl.src = publicUrl;
                imgEl.alt = "file";
-               imgEl.style.height = "50vh";
+               imgEl.style.width = "50%";
+
                imgEl.style.borderRadius = "2px";
                imgEl.style.marginTop = "10px";
                imgEl.style.transition="all 0.5s ease-out"
