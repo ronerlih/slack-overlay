@@ -17,7 +17,7 @@
 			}
 			::-webkit-scrollbar-track {
 				-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-				background-color: rgba(80, 19, 203, 0.345);
+				background-color: hsla(260, 83%, 44%, 0.345);
 			}
 			::-webkit-scrollbar-corner {
 				background: rgba(80, 19, 203, 0.645);
@@ -31,13 +31,14 @@
 
 			::-webkit-scrollbar-thumb {
 				background-color: rgba(80, 19, 203, 0.345);
-				border: 2px solid rgba(80, 19, 203, 0.645);
+				border: 2px solid #5013cb;
 			}
 		</style>
 	</head>
 	<body
 		style="
-			background: rgba(80, 19, 203, 0.345);
+			/* background: #5013cb58; */
+			background: rgba(0, 0, 0, 0.345);
 			color: white;
 			font-family: Verdana, Geneva, Tahoma, sans-serif;
          margin: 10px;
@@ -53,7 +54,7 @@
 				type="range"
 				min="0.01"
 				max="100"
-				value="34.5"
+				value="20"
 				step="0.001"
 				id="brightness-slider"
 			/>
@@ -68,6 +69,13 @@
 			>
 			</i>
 		</div>
+      <div>
+         <div>
+            <a class="bg-selection" data-color="#5013cb58"><i class="fas fa-circle" style="color:rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i></a>
+            <a class="bg-selection" data-color="#00000058"><i class="fas fa-circle" style="color:black; -webkit-text-stroke: 1px white"></i></a>
+            <a class="bg-selection" data-color="#FFFFFF58"><i class="fas fa-circle" style="color:white; -webkit-text-stroke: 1px black"></i></a>
+         </div>
+      </div>
    </header>
 
 		<h4>ask the class channel</h4>
@@ -82,16 +90,22 @@
 			const bodyStyle = document.body.style;
 			const sliderEl = document.querySelector("#brightness-slider");
 			const threadsEl = document.querySelector("#threads");
-
+         const bgSelection = document.querySelectorAll(".bg-selection");
+         bgSelection.forEach(elem => {
+            elem.style.cursor = "pointer";
+            elem.onclick = function() { document.body.style.background = this.dataset.color}});
 			const rootThreads = {};
 
 			const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` } };
 			let users = {};
 
 			// SLIDER
-			sliderEl.oninput = function () {
-				bodyStyle.background = `rgba(80, 19, 203, ${this.value / 100})`;
-			};
+			sliderEl.oninput = function (e) {
+            console.log("rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + (e.target.value / 100) + ")")
+				// bodyStyle.background = bodyStyle.background.slice(0,-2) +  (this.value / 100).toString(16);
+            bodyStyle.background = "rgba(" +bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(',') + 1 ) + (e.target.value / 100) + ")";
+            console.log(bodyStyle.background )
+         };
 
 			// fetch users
 			fetch("https://slack.com/api/users.list", slackOptions)
@@ -142,20 +156,20 @@
                imgEl.onclick = function () {
                   if(this.dataset.zoom === 'false'){
                      this.setAttribute('data-zoom', 'true');
-                     this.style.width = "100%";
+                     this.style.height = "calc(100vh - 25px)";
                   } else {
                      this.setAttribute('data-zoom', 'false');
-                     this.style.width = "50%";
+                     this.style.height = "50vh";
                   }
                }
                imgEl.src = publicUrl;
                imgEl.alt = "file";
-               imgEl.style.width = "50%";
+               imgEl.style.height = "50vh";
                imgEl.style.borderRadius = "2px";
                imgEl.style.marginTop = "10px";
                imgEl.style.transition="all 0.5s ease-out"
                // imgEl.style.border = "2px solid #1cb7a2"
-               isReply ? imgEl.style.border = "solid 1px #fcb7a2": imgEl.style.border = "solid 1px #1cb7a2"
+               isReply ? imgEl.style.border = "solid 1px #b213cb": imgEl.style.border = "solid 1px #1cb7a2"
 
 
                imgEl.style.display = "block";
@@ -165,10 +179,8 @@
 			 function newMessage(message, isReply) {
 				// create element
 				const messageContainerEl = document.createElement("div");
-				messageContainerEl.columnCount = 2;
-
             const messageEl = document.createElement("div");
-            
+
             // avatar
             const userEl = document.createElement('div');
             const avatarEl = document.createElement('img');
@@ -181,15 +193,14 @@
             avatarEl.style.lineHeight = "100%";
             avatarEl.style.verticalAlign = "top";
             
-            userNameEl.textContent = users[message.user].name;
+            // username + date
+            userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>` ;
             userNameEl.style.display = "inline-block";
-            userNameEl.style.fontWeight = "600";
             userNameEl.style.marginBottom = "5px";
-
             userNameEl.style.verticalAlign = "top";
 
-            // userEl.appendChild(userNameEl);
-
+            
+            console.log()
             // main div and text
             messageContainerEl.appendChild(messageEl);
             messageEl.appendChild(avatarEl);
@@ -206,10 +217,10 @@
             messageEl.appendChild(messageWrapEl);
 
 				messageEl.style.border = "solid 1px #1cb7a2";
-            isReply ? messageEl.style.border = "solid 1px #fcb7a2": messageEl.style.border = "solid 1px #1cb7a2"
+            isReply ? messageEl.style.border = "solid 1px #b213cb": messageEl.style.border = "solid 1px #1cb7a2"
 
 				messageEl.style.marginTop = "10px";
-				messageEl.style.display = "inline-block";
+				messageEl.style.display = "block";
             // isReply ? messageEl.style.background = "#5639caad" : messageEl.style.background = "#5639caad"
             ;
             messageEl.style.background = "#5639caad"
@@ -278,6 +289,22 @@
 			socket.on("broadcast", (newMessage) => {
 				console.log(newMessage);
 			});
+         function timeStampToDate(ts) {
+            let unix_timestamp = 1549312452
+            // Create a new JavaScript Date object based on the timestamp
+            // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+            var date = new Date(unix_timestamp * 1000);
+            // Hours part from the timestamp
+            var hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours() ;
+
+            // Minutes part from the timestamp
+            var minutes = "0" + date.getMinutes() ;
+
+            // Will display time in 10:30:23 format
+            var formattedTime = hours + ':' + minutes.substr(-2) + (date.getHours() > 12 ? "pm" : "am");
+
+            return formattedTime;
+         }
 		</script>
 	</body>
 </html>

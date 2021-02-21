@@ -3,10 +3,10 @@ require("dotenv").config();
 const { app, BrowserWindow, screen, nativeImage } = require("electron");
 const SCREEN_WIDTH = 600;
 
-function createWindow() {
+function createWindow() { 
 	const win = new BrowserWindow({
 		width: SCREEN_WIDTH,
-		height: 300,
+		height: 450,
       title: "slack overlay",
 		transparent: true,
 		// titleBarStyle: "dark",
