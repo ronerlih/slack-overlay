@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const { app, BrowserWindow, screen, nativeImage } = require("electron");
-const SCREEN_WIDTH = 600;
+const SCREEN_WIDTH = 450;
 
 function createWindow() { 
 	const win = new BrowserWindow({

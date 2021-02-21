@@ -88,9 +88,9 @@
 					elem.style.cursor = "pointer";
 					elem.onclick = function () {
 						bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")";
-                  console.log(this.dataset.miniTitleColor)
-                  miniTitleEl.style.color = this.dataset.miniTitleColor;
-               };
+						console.log(this.dataset.miniTitleColor);
+						miniTitleEl.style.color = this.dataset.miniTitleColor;
+					};
 				});
 			}
 
@@ -98,9 +98,7 @@
 				sliderEl.value = backgroundOpacity;
 
 				sliderEl.oninput = function (e) {
-					console.log(bodyStyle.background);
 					backgroundOpacity = e.target.value / 100;
-					console.log("rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")");
 					bodyStyle.background =
 						"rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")";
 					"rgba(" + bodyStyle.background.substring(5, bodyStyle.background.lastIndexOf(",") + 1) + backgroundOpacity + ")";
@@ -122,6 +120,7 @@
 			function scrollToBottom() {
 				setTimeout(() => window.scrollTo(0, document.body.clientHeight), 500);
 			}
+
 			function fetchUsers() {
 				return fetch(usersEndPoint, slackOptions)
 					.then((response) => response.json())
@@ -144,11 +143,16 @@
 			async function newFile(file, isReply) {
 				const response = await fetch(file.url_private, slackOptions);
 				const image = await response.blob();
-				// Then create a local URL for that image and print it
-				publicUrl = URL.createObjectURL(image);
+
+				return createImg(image, isReply);
+			}
+
+			function createImg(image, isReply) {
+				const publicUrl = URL.createObjectURL(image);
 				const imgEl = document.createElement("img");
 
 				imgEl.setAttribute("data-zoom", "false");
+				imgEl.classList.add("img");
 				imgEl.onclick = function () {
 					if (this.dataset.zoom === "false") {
 						this.setAttribute("data-zoom", "true");
@@ -161,27 +165,24 @@
 
 				imgEl.src = publicUrl;
 				imgEl.alt = "file";
-				imgEl.style.width = "50%";
 
-				imgEl.style.borderRadius = "2px";
-				imgEl.style.marginTop = "10px";
-				imgEl.style.transition = "all 0.5s ease-out";
 				// imgEl.style.border = "2px solid #1cb7a2"
 				isReply ? (imgEl.style.border = "solid 1px #b213cb") : (imgEl.style.border = "solid 1px #1cb7a2");
 
-				imgEl.style.display = "block";
 				return imgEl;
 			}
 
-			function newMessage(message, isReply) {
+			function createMessage(message, isReply) {
 				// create element
 				const messageContainerEl = document.createElement("div");
 				const messageEl = document.createElement("div");
 
-				// avatar
+				return messageEl;
+			}
+			// avatar
+			function createAvatar(message, isReply) {
 				const userEl = document.createElement("div");
 				const avatarEl = document.createElement("img");
-				const userNameEl = document.createElement("div");
 				avatarEl.src = users[message.user].avatar;
 				avatarEl.width = 30;
 				avatarEl.style.display = "inline-block";
@@ -189,22 +190,37 @@
 				avatarEl.style.borderRadius = "2px";
 				avatarEl.style.lineHeight = "100%";
 				avatarEl.style.verticalAlign = "top";
+				return avatarEl;
+			}
+
+         function createUserEl(message) {
+					const userNameEl = document.createElement("div");
+					userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>`;
+					userNameEl.style.display = "inline-block";
+					userNameEl.style.marginBottom = "5px";
+					userNameEl.style.verticalAlign = "top";
+               return userNameEl;
+				}
+
+			function newMessage(message, isReply) {
+
+            const messageContainerEl = document.createElement("div");
+				const messageEl = document.createElement("div");
+
+            const messageWrapEl = document.createElement("div");
+				const messageTextEl = document.createElement("div");
+            messageWrapEl.classList.add('messageWrap')
+
+				const avatarEl = createAvatar(message, isReply);
+
+				// avatar
+				messageEl.append(avatarEl);
 
 				// username + date
-				userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>`;
-				userNameEl.style.display = "inline-block";
-				userNameEl.style.marginBottom = "5px";
-				userNameEl.style.verticalAlign = "top";
+            const userNameEl = createUserEl(message, isReply);
 
 				// main div and text
 				messageContainerEl.appendChild(messageEl);
-				messageEl.appendChild(avatarEl);
-
-				const messageWrapEl = document.createElement("div");
-				const messageTextEl = document.createElement("div");
-				messageWrapEl.style.display = "inline-block";
-				messageWrapEl.style.width = "calc(100% - 50px)";
-				messageWrapEl.style.marginLeft = "5px";
 
 				messageTextEl.textContent = message.text;
 				messageWrapEl.appendChild(userNameEl);
