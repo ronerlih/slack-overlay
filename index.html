@@ -193,58 +193,18 @@
 				return avatarEl;
 			}
 
-         function createUserEl(message) {
-					const userNameEl = document.createElement("div");
-					userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>`;
-					userNameEl.style.display = "inline-block";
-					userNameEl.style.marginBottom = "5px";
-					userNameEl.style.verticalAlign = "top";
-               return userNameEl;
-				}
-
-			function newMessage(message, isReply) {
-
-            const messageContainerEl = document.createElement("div");
-				const messageEl = document.createElement("div");
-
-            const messageWrapEl = document.createElement("div");
-				const messageTextEl = document.createElement("div");
-            messageWrapEl.classList.add('messageWrap')
-
-				const avatarEl = createAvatar(message, isReply);
-
-				// avatar
-				messageEl.append(avatarEl);
-
-				// username + date
-            const userNameEl = createUserEl(message, isReply);
-
-				// main div and text
-				messageContainerEl.appendChild(messageEl);
-
-				messageTextEl.textContent = message.text;
-				messageWrapEl.appendChild(userNameEl);
-				messageWrapEl.appendChild(messageTextEl);
-				messageEl.appendChild(messageWrapEl);
-
-				messageEl.style.border = "solid 1px #1cb7a2";
-				isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
-
-				messageEl.style.marginTop = "10px";
-				messageEl.style.display = "block";
-				// isReply ? messageEl.style.background = "#5639caad" : messageEl.style.background = "#5639caad"
-				messageEl.style.background = "#5639caad";
-				messageEl.style.padding = "5px";
-				messageEl.style.borderRadius = "2px";
-				messageEl.style.boxShadow = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
-
-				// reply style
-				isReply ? (messageContainerEl.style.marginLeft = "10px") : (messageContainerEl.style.marginTop = "20px");
-
-				// reactions
+			function createUserEl(message) {
+				const userNameEl = document.createElement("div");
+				userNameEl.innerHTML = `<strong>${users[message.user].name}</strong> <font style="font-size: 13px">${timeStampToDate(message.ts)}</font>`;
+				userNameEl.style.display = "inline-block";
+				userNameEl.style.marginBottom = "5px";
+				userNameEl.style.verticalAlign = "top";
+				return userNameEl;
+			}
+			// reactions
+			function createReactions(message) {
+				const reactionContainerEl = document.createElement("div");
 				if (message.reactions && message.reactions.length > 0) {
-					const reactionContainerEl = document.createElement("div");
-
 					message.reactions.forEach((reaction) => {
 						const reactionEl = document.createElement("div");
 						reactionContainerEl.appendChild(reactionEl);
@@ -252,33 +212,63 @@
 						reactionEl.textContent = emojis[":" + reaction.name + ":"];
 						reactionEl.style.display = "inline";
 						reactionEl.style.margin = "2px";
-						messageContainerEl.appendChild(reactionContainerEl);
 					});
 				}
+				return reactionContainerEl;
+			}
+			function newMessage(message, isReply) {
+				const messageContainerEl = document.createElement("div");
+				const messageEl = document.createElement("div");
+
+				const messageWrapEl = document.createElement("div");
+				const messageTextEl = document.createElement("div");
+				messageWrapEl.classList.add("messageWrap");
+				messageEl.classList.add("message-el");
+
+				const avatarEl = createAvatar(message, isReply);
+
+				// avatar
+				messageEl.append(avatarEl);
+
+				// username + date
+				const userNameEl = createUserEl(message, isReply);
+
+				// main div and text
+				messageContainerEl.appendChild(messageEl);
+				messageTextEl.textContent = message.text;
+				messageWrapEl.appendChild(userNameEl);
+				messageWrapEl.appendChild(messageTextEl);
+				messageEl.appendChild(messageWrapEl);
+
+				// reply style
+				isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
+				isReply ? (messageContainerEl.style.marginLeft = "10px") : (messageContainerEl.style.marginTop = "20px");
+
+				// reaction
+				messageContainerEl.appendChild(createReactions(message));
 
 				// files
 				if (message.files)
 					message.files.forEach(async (file) => messageContainerEl.appendChild(await newFile(file, rootThreads[message.thread_ts])));
 
 				// get thread
-				if (message.thread_ts && !rootThreads[message.thread_ts]) {
-					rootThreads[message.thread_ts] = true;
+				if (message.thread_ts && !rootThreads[message.thread_ts]) getThread(message, messageContainerEl);
 
-					fetch(
-						`https://slack.com/api/conversations.replies?inclusive=true&channel=${process.env.channel}&ts=${message.thread_ts}`,
-						slackOptions
-					)
-						.then((response) => response.json())
-						.then((completeThread) => {
-							completeThread.messages.map((block) => {
-								messageContainerEl.appendChild(newMessage(block));
-							});
-							scrollToBottom();
-						});
-				}
 				return messageContainerEl;
 			}
 
+			function getThread(message, container) {
+				rootThreads[message.thread_ts] = true;
+
+				fetch(`https://slack.com/api/conversations.replies?inclusive=true&channel=${process.env.channel}&ts=${message.thread_ts}`, slackOptions)
+					.then((response) => response.json())
+					.then((completeThread) => {
+						completeThread.messages.map((block) => {
+							container.appendChild(newMessage(block));
+						});
+						scrollToBottom();
+					});
+			}
 			// socketIO
 			function setupSocketIO() {
 				const socket = io("https://slack-overlay-service.herokuapp.com/");
@@ -286,10 +276,8 @@
 				socket.on("connect", () => console.log("websocket conection"));
 				socket.on("broadcast", async (msg) => {
 					console.log(msg);
-					newMessage(msg.event).then((msgEl) => {
-						threadsEl.appendChild(msgEl);
-						scrollToBottom();
-					});
+					threadsEl.appendChild(newMessage(msg.event));
+					scrollToBottom();
 				});
 			}
 
