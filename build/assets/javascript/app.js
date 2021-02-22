@@ -31,6 +31,7 @@ function init(){
 
    // fetch users
    fetchUsers()
+   
    // fetch history
    .then(fetchHistory);
 

@@ -31,8 +31,7 @@ function createWindow() {
 }
 
 // set icon for mac
-const image = nativeImage
-   .createFromPath(app.getAppPath() + "/build/icon.png");
+const image = nativeImage.createFromPath(app.getAppPath() + "/build/icon.png");
 app.dock.setIcon(image);
    
 app.whenReady().then(createWindow);
