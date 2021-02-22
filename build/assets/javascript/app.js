@@ -197,15 +197,15 @@ function newMessage(message, isReply) {
    isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
    isReply ? (messageContainerEl.style.marginLeft = "10px") : (messageContainerEl.style.marginTop = "20px");
 
-   // reaction
-   messageContainerEl.appendChild(createReactions(message));
-
    // files
    if (message.files)
       message.files.forEach(async (file) => messageContainerEl.appendChild(await newFile(file, rootThreads[message.thread_ts])));
-
+ 
    // get thread
    if (message.thread_ts && !rootThreads[message.thread_ts]) getThread(message, messageContainerEl);
+
+   // reaction
+   messageContainerEl.appendChild(createReactions(message));
 
    return messageContainerEl;
 }
@@ -218,7 +218,7 @@ function getThread(message, container) {
       .then((response) => response.json())
       .then((completeThread) => {
          completeThread.messages.map((block) => {
-            container.appendChild(newMessage(block));
+            container.appendChild(newMessage(block, true));
          });
          scrollToBottom();
       });

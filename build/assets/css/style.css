@@ -1,5 +1,6 @@
 html {
 	scroll-behavior: smooth;
+   overflow-x: hidden;
 }
 ::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -13,7 +14,7 @@ html {
 }
 
 ::-webkit-scrollbar {
-	width: 6px;
+	width: 7px;
 	height: 6px;
 	background-color: rgba(80, 19, 203, 0.345);
 }
@@ -59,5 +60,5 @@ header {
    padding : 5px;
    border-radius : 2px;
    box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
+   word-break: break-all;
 }

@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config({path:__dirname+'/build/.env'})
 
 const { app, BrowserWindow, screen, nativeImage } = require("electron");
 const SCREEN_WIDTH = 450;
@@ -27,7 +27,7 @@ function createWindow() {
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
-   win.webContents.openDevTools()
+   // win.webContents.openDevTools()
 }
 
 // set icon for mac
