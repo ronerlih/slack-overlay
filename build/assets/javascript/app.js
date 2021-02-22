@@ -1,3 +1,7 @@
+var osWindowProcess = require('electron').ipcRenderer;
+let isMenuCollapsed = false;
+let isWindowCollapsed = false;
+
 // api vars
 const usersEndPoint = "https://slack.com/api/users.list";
 const conversationHistoryEndPoint = `https://slack.com/api/conversations.history?inclusive=true&channel=${process.env.channel}`;
@@ -7,7 +11,8 @@ const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` }
 const sliderEl = document.querySelector("#brightness-slider");
 const threadsEl = document.querySelector("#threads");
 const miniTitleEl = document.querySelector("#mini-title");
-const bgSelection = document.querySelectorAll(".bg-selection");
+const headerEl = document.querySelector("header");
+const body = document.body;
 const bodyStyle = document.body.style;
 
 // local vars
@@ -40,14 +45,44 @@ function init(){
 // theme color event handlers
 function setupEventHandlers() {
    // event handlers
-   bgSelection.forEach((elem) => {
-      elem.style.cursor = "pointer";
-      elem.onclick = function () {
-         bodyStyle.background = "rgba(" + elem.dataset.color.substring(5, elem.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")";
-         console.log(this.dataset.miniTitleColor);
-         miniTitleEl.style.color = this.dataset.miniTitleColor;
+      body.onclick = function (e) {
+
+         // bg color
+         if (e.target.parentElement.classList.contains("bg-selection")){
+            bodyStyle.background = "rgba(" + e.target.parentElement.dataset.color.substring(5, e.target.parentElement.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")";
+            miniTitleEl.style.color = e.target.parentElement.dataset.miniTitleColor;
+         }
+
+         // collapse menu
+         if(e.target.id === "collapse-menu"){
+            if(isMenuCollapsed) {
+               e.target.style.transform = "rotate(0deg)";
+               headerEl.style.height = "46px";
+            } else {
+               e.target.style.transform = "rotate(180deg)";
+               headerEl.style.height = "20px";
+            }
+            isMenuCollapsed = !isMenuCollapsed;
+         }
+
+         // collapse window
+         if(e.target.id === "collapse-window"){
+            
+            if (isWindowCollapsed)
+                {
+                  osWindowProcess.send('collapse', isWindowCollapsed);
+                  e.target.style.transform = "rotate(0deg)";
+               } else {
+                  osWindowProcess.send('collapse', isWindowCollapsed);
+                  e.target.style.transform = "rotate(180deg)";
+               }
+            isWindowCollapsed = !isWindowCollapsed;
+
+         }
+
+
+         return;
       };
-   });
 }
 
 // brightness slider
@@ -131,7 +166,6 @@ function createImg(image, isReply) {
 
 // avatar
 function createAvatar(message, isReply) {
-   const userEl = document.createElement("div");
    const avatarEl = document.createElement("img");
    avatarEl.src = users[message.user].avatar;
    avatarEl.width = 30;

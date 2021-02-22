@@ -32,11 +32,14 @@ body {
 }
 header {
 	position: fixed;
-	top: 10px;
+	top: 5px;
+   height:46px;
 	right: 5px;
 	background-color: rgba(80, 19, 203, 0.645);
 	padding: 6px;
 	border: 1px solid white;
+   transition: all 0.3s ease-in;
+   overflow-y: hidden;
 }
 .img {
    width: 50%;
@@ -55,10 +58,26 @@ header {
 .message-el{
    border : solid 1px #1cb7a2;
    margin-top : 10px;
+   min-width: 200px;
    display : block;
    background : #5639caad;
    padding : 5px;
    border-radius : 2px;
    box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
    word-break: break-all;
+}
+
+.bg-selection {
+   cursor: pointer;
+}
+
+#collapse-menu {
+   transition: all 0.3s ease-in;
+}
+
+#collapse-window {
+   position: fixed;
+   left: 2px;
+   top: 4px;
+   transition: all 0.3s ease-in;
 }

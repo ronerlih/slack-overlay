@@ -3,41 +3,50 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
+		
+      <!-- google fonts -->
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+		
+      <!-- font awsome -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
 
 		<!-- local css -->
 		<link rel="stylesheet" href="build/assets/css/style.css" />
 	</head>
+   
 	<body style="background: rgba(0, 0, 0, 0.345)">
+      <i class="fas fa-chevron-circle-right" id="collapse-window"></i>
+
 		<header>
 			<img alt="slack_logo" src="build/assets/images/slack_logo.png" width="70" style="vertical-align: middle" />
 			<span><em>overlay</em></span>
-			<div style="float: right">
-				<input
-					style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
-					type="range"
-					min="0.01"
-					max="99"
-					value="20"
-					step="0.001"
-					id="brightness-slider"
-				/>
-				<i class="fas fa-adjust" style="font-size: 14px; display: inline-block; vertical-align: middle; margin-left: -8px"> </i>
-			</div>
-			<div>
-				<div>
-					<a class="bg-selection" data-color="rgba(80, 19, 203, 0.345)" data-mini-title-color="white"
-						><i class="fas fa-circle" style="color: rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i
-					></a>
-					<a class="bg-selection" data-color="rgba(0, 0, 0, 0.345)" data-mini-title-color="white"
-						><i class="fas fa-circle" style="color: black; -webkit-text-stroke: 1px white"></i
-					></a>
-					<a class="bg-selection" data-color="rgba(255, 255, 255, 0.345)" data-mini-title-color="#000000A0"
-						><i class="fas fa-circle" style="color: white; -webkit-text-stroke: 1px rgba(0, 0, 0, 0.509)"></i
-					></a>
-				</div>
-			</div>
+			 <i class="fas fa-chevron-circle-up" id="collapse-menu"></i>
+         <div>
+            <div style="float: right">
+               <input
+                  style="height: 4px; width: 40px; display: inline-block; vertical-align: middle"
+                  type="range"
+                  min="0.01"
+                  max="99"
+                  value="20"
+                  step="0.001"
+                  id="brightness-slider"
+               />
+               <i class="fas fa-adjust" style="font-size: 14px; display: inline-block; vertical-align: middle; margin-left: -8px"> </i>
+            </div>
+            <div style="margin-top:6px;">
+               <a class="bg-selection" data-color="rgba(80, 19, 203, 0.345)" data-mini-title-color="white"
+                  ><i class="fas fa-circle" style="color: rgba(80, 19, 203, 0.845); -webkit-text-stroke: 1px white"></i
+               ></a>
+               <a class="bg-selection" data-color="rgba(0, 0, 0, 0.345)" data-mini-title-color="white"
+                  ><i class="fas fa-circle" style="color: black; -webkit-text-stroke: 1px white"></i
+               ></a>
+               <a class="bg-selection" data-color="rgba(255, 255, 255, 0.345)" data-mini-title-color="#000000A0"
+                  ><i class="fas fa-circle" style="color: white; -webkit-text-stroke: 1px rgba(0, 0, 0, 0.509)"></i
+               ></a>
+            </div>
+         </div>
+			
 		</header>
 
 		<h4 id="mini-title">ask the class channel feed</h4>

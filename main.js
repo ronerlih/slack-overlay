@@ -1,12 +1,11 @@
 require('dotenv').config({path:__dirname+'/build/.env'})
 
-const { app, BrowserWindow, screen, nativeImage } = require("electron");
-const SCREEN_WIDTH = 450;
-
+const { app, BrowserWindow, screen, nativeImage, ipcMain } = require("electron");
+const SCREEN_WIDTH = 385;
 function createWindow() { 
 	const win = new BrowserWindow({
 		width: SCREEN_WIDTH,
-		height: 450,
+		height: SCREEN_WIDTH,
       title: "slack overlay",
 		transparent: true,
 		// titleBarStyle: "dark",
@@ -23,7 +22,19 @@ function createWindow() {
 	});
 
 	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-	win.setPosition(width - SCREEN_WIDTH, 0);
+	win.setPosition(width - SCREEN_WIDTH, 0, true);
+
+   ipcMain.on('collapse', (event, arg) => {
+
+      if (arg){
+         win.setPosition(width - SCREEN_WIDTH , 0, true);
+         win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
+      } else {
+         win.setSize(SCREEN_WIDTH, height, true);
+         win.setPosition(width - 20 , 0, true);
+      }
+    })
+    
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
