@@ -80,4 +80,5 @@ header {
    left: 2px;
    top: 4px;
    transition: all 0.3s ease-in;
+   z-index: 2;
 }

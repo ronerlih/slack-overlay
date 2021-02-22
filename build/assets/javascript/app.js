@@ -1,6 +1,6 @@
 var osWindowProcess = require('electron').ipcRenderer;
 let isMenuCollapsed = false;
-let isWindowCollapsed = false;
+let windowState = "initial";
 
 // api vars
 const usersEndPoint = "https://slack.com/api/users.list";
@@ -11,6 +11,8 @@ const slackOptions = { headers: { Authorization: `Bearer ${process.env.token}` }
 const sliderEl = document.querySelector("#brightness-slider");
 const threadsEl = document.querySelector("#threads");
 const miniTitleEl = document.querySelector("#mini-title");
+const collapseWindowEl = document.querySelector("#collapse-window");
+const collapseMenuEl = document.querySelector("#collapse-menu");
 const headerEl = document.querySelector("header");
 const body = document.body;
 const bodyStyle = document.body.style;
@@ -55,6 +57,7 @@ function setupEventHandlers() {
 
          // collapse menu
          if(e.target.id === "collapse-menu"){
+
             if(isMenuCollapsed) {
                e.target.style.transform = "rotate(0deg)";
                headerEl.style.height = "46px";
@@ -68,21 +71,51 @@ function setupEventHandlers() {
          // collapse window
          if(e.target.id === "collapse-window"){
             
-            if (isWindowCollapsed)
-                {
-                  osWindowProcess.send('collapse', isWindowCollapsed);
-                  e.target.style.transform = "rotate(0deg)";
-               } else {
-                  osWindowProcess.send('collapse', isWindowCollapsed);
+            switch (windowState){
+               case "initial":
+                  windowState = "side";
+                  osWindowProcess.send('collapse', windowState);
+                  e.target.style.transform = "rotate(270deg)";
+                  break;
+               case "side":
+                  windowState = "swipped";
+                  osWindowProcess.send('collapse', windowState);
                   e.target.style.transform = "rotate(180deg)";
-               }
-            isWindowCollapsed = !isWindowCollapsed;
+                  break;
+               case "swipped":
+                  windowState = "corner";
+                  osWindowProcess.send('collapse', windowState);
+                  e.target.style.transform = "rotate(90deg)";
+                  
+                  // collapse prefrences menu
+                  collapseMenuEl.style.transform = "rotate(180deg)";
+                  headerEl.style.height = "20px";
+                  isMenuCollapsed = true;
+                  break;
+               case "corner":
+                  windowState = "initial";
+                  osWindowProcess.send('collapse', windowState);
+                  e.target.style.transform = "rotate(0deg)";
 
-         }
+                  // expand prefrences menu
+                  collapseMenuEl.style.transform = "rotate(0deg)";
+                  headerEl.style.height = "46px";
+                  isMenuCollapsed = false;
+                  break;
+               default: console.warning( "DEFAULTED switch on app.js:87")
 
+            } 
 
          return;
+      } else {
+         if (windowState === "swipped") {
+                  windowState = "side";
+                  osWindowProcess.send('collapse', windowState);
+                  collapseWindowEl.style.transform = "rotate(270deg)";
+         }
+
       };
+   }
 }
 
 // brightness slider

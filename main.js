@@ -26,13 +26,26 @@ function createWindow() {
 
    ipcMain.on('collapse', (event, arg) => {
 
-      if (arg){
-         win.setPosition(width - SCREEN_WIDTH , 0, true);
-         win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
-      } else {
-         win.setSize(SCREEN_WIDTH, height, true);
-         win.setPosition(width - 20 , 0, true);
+      switch (arg){
+         case "initial":
+            win.setPosition(width - SCREEN_WIDTH , 0, true);
+            win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
+            break;
+         case "swipped":
+            win.setSize(SCREEN_WIDTH, height, true);
+            win.setPosition(width - 20 , 0, true);
+            break;
+         case "side":
+            win.setSize(SCREEN_WIDTH, height, true);
+            win.setPosition(width - SCREEN_WIDTH , 0, true);
+            break;
+         case "corner":
+            win.setSize(150, 45, true);
+            win.setPosition(width - 150 , 80, true);
+            break;
+         default: console.warning( "DEFAULTED switch on main.js:42")
       }
+
     })
     
    win.loadFile("index.html");
