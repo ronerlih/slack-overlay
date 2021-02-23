@@ -40,8 +40,8 @@ function createWindow() {
             win.setPosition(width - SCREEN_WIDTH , 0, true);
             break;
          case "corner":
-            win.setSize(150, 45, true);
-            win.setPosition(width - 150 , 80, true);
+            win.setSize(203, 20, true);
+            win.setPosition(width - 20 , 150, true);
             break;
          default: console.warning( "DEFAULTED switch on main.js:42")
       }

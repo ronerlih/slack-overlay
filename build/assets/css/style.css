@@ -59,6 +59,7 @@ header {
    border : solid 1px #1cb7a2;
    margin-top : 10px;
    min-width: 200px;
+   max-width: 500px;
    display : block;
    background : #5639caad;
    padding : 5px;

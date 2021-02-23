@@ -181,10 +181,10 @@ function createImg(image, isReply) {
    imgEl.onclick = function () {
       if (this.dataset.zoom === "false") {
          this.setAttribute("data-zoom", "true");
-         this.style.width = "50%";
+         this.style.width = "100%";
       } else {
          this.setAttribute("data-zoom", "false");
-         this.style.width = "100%";
+         this.style.width = "50%";
       }
    };
 
