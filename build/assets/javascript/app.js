@@ -47,7 +47,7 @@ function init(){
 // theme color event handlers
 function setupEventHandlers() {
    // event handlers
-      body.onclick = function (e) {
+      document.onclick = function (e) {
 
          // bg color
          if (e.target.parentElement.classList.contains("bg-selection")){

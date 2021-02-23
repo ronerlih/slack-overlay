@@ -2,6 +2,11 @@ html {
 	scroll-behavior: smooth;
    overflow-x: hidden;
 }
+body {
+   height: 100vh;
+   margin: 0px;
+   padding: 10px;
+}
 ::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 	background-color: hsla(260, 83%, 44%, 0.345);
@@ -78,7 +83,7 @@ header {
 
 #collapse-window {
    position: fixed;
-   left: 2px;
+   left: 4px;
    top: 4px;
    transition: all 0.3s ease-in;
    z-index: 2;
