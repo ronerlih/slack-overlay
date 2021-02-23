@@ -2,11 +2,6 @@ html {
 	scroll-behavior: smooth;
    overflow-x: hidden;
 }
-body {
-   height: 100vh;
-   margin: 0px;
-   padding: 10px;
-}
 ::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 	background-color: hsla(260, 83%, 44%, 0.345);
@@ -45,6 +40,10 @@ header {
 	border: 1px solid white;
    transition: all 0.3s ease-in;
    overflow-y: hidden;
+}
+
+#mini-title{
+   margin-top: 30px;
 }
 .img {
    width: 50%;
