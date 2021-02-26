@@ -1,6 +1,6 @@
 var osWindowProcess = require('electron').ipcRenderer;
 let isMenuCollapsed = false;
-let windowState = "initial";
+let windowState = localStorage.windowState || "corner";
 
 // api vars
 const usersEndPoint = "https://slack.com/api/users.list";
@@ -50,7 +50,7 @@ function setupEventHandlers() {
       document.onclick = function (e) {
 
          // bg color
-         if (e.target.parentElement.classList.contains("bg-selection")){
+         if (e.target.parentElement && e.target.parentElement.classList.contains("bg-selection")){
             bodyStyle.background = "rgba(" + e.target.parentElement.dataset.color.substring(5, e.target.parentElement.dataset.color.lastIndexOf(",") + 1) + backgroundOpacity + ")";
             miniTitleEl.style.color = e.target.parentElement.dataset.miniTitleColor;
          }
@@ -71,6 +71,9 @@ function setupEventHandlers() {
          // collapse window
          if(e.target.id === "collapse-window"){
             
+            // save to local storage
+            localStorage.windowState = windowState;
+
             switch (windowState){
                case "initial":
                   windowState = "side";
@@ -105,7 +108,7 @@ function setupEventHandlers() {
                default: console.warning( "DEFAULTED switch on app.js:87")
 
             } 
-
+            
          return;
       } else {
          if (windowState === "swipped") {
@@ -115,7 +118,16 @@ function setupEventHandlers() {
          }
 
       };
+
+      document.onkeypress = function (e) {
+         e = e || window.event;
+         if (e.key.toLowerCase() === "t")
+            collapseWindowEl.click();
+     };
    }
+
+   // trigger last window mode
+   collapseWindowEl.click();
 }
 
 // brightness slider

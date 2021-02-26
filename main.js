@@ -41,7 +41,7 @@ function createWindow() {
             break;
          case "corner":
             win.setSize(203, 24, true);
-            win.setPosition(width - 22 , 150, true);
+            win.setPosition(width - 21 , 150, true);
             break;
          default: console.warning( "DEFAULTED switch on main.js:42")
       }
@@ -51,7 +51,7 @@ function createWindow() {
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
-   // win.webContents.openDevTools()
+   win.webContents.openDevTools()
 }
 
 // set icon for mac
