@@ -15,6 +15,7 @@ function createWindow() {
       shadow: false,
       hasShadow: false,
 		zoomToPageWidth: true,
+      roundedCorners: false,
       // border: 10,
 		webPreferences: {
 			nodeIntegration: true,
@@ -51,7 +52,7 @@ function createWindow() {
    win.loadFile("index.html");
 
    // DEBUGGING - dev tools
-   win.webContents.openDevTools()
+   // win.webContents.openDevTools()
 }
 
 // set icon for mac
