@@ -2,6 +2,8 @@ require('dotenv').config({path:__dirname+'/build/.env'})
 
 const { app, BrowserWindow, screen, nativeImage, ipcMain } = require("electron");
 const SCREEN_WIDTH = 385;
+let visibility = true;
+
 function createWindow() { 
 	const win = new BrowserWindow({
 		width: SCREEN_WIDTH,
@@ -21,30 +23,35 @@ function createWindow() {
 		},
 	});
 
-	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-	win.setPosition(width - SCREEN_WIDTH, 0, true);
+   const { width, height } = screen.getPrimaryDisplay().size;
+   
+   windowWidth  = width;
+   windowHeight = height;
+
+   // get displays
+   let displays = screen.getAllDisplays()
+   externalDisplay = displays.find((display) => {
+     return display.bounds.x !== 0 || display.bounds.y !== 0
+   })
+
+   if (externalDisplay) { 
+      visiblePositioning = () => win.setPosition(externalDisplay.size.width -SCREEN_WIDTH, windowHeight , true);
+      hiddenPositioning = () => win.setPosition(externalDisplay.size.width - 8, windowHeight , true);
+   } 
+   else { 
+      visiblePositioning = () => win.setPosition(width - SCREEN_WIDTH, 0, true);
+      hiddenPositioning = () => win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
+   }
+      
+
+	visiblePositioning()
 
    ipcMain.on('collapse', (event, arg) => {
-
-      switch (arg){
-         case "initial":
-            win.setPosition(width - SCREEN_WIDTH , 0, true);
-            win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
-            break;
-         case "swipped":
-            win.setSize(SCREEN_WIDTH, height, true);
-            win.setPosition(width - 20 , 0, true);
-            break;
-         case "side":
-            win.setSize(SCREEN_WIDTH, height, true);
-            win.setPosition(width - SCREEN_WIDTH , 0, true);
-            break;
-         case "corner":
-            win.setSize(203, 24, true);
-            win.setPosition(width - 21 , 150, true);
-            break;
-         default: console.warning( "DEFAULTED switch on main.js:42")
-      }
+      visibility = !visibility;
+      visibility 
+         ? visiblePositioning()
+         : hiddenPositioning();
+      
 
     })
     

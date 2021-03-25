@@ -18,7 +18,7 @@ const body = document.body;
 const bodyStyle = document.body.style;
 
 // local vars
-let backgroundOpacity = 0.234;
+let backgroundOpacity = 0.0;
 const rootThreads = {};
 let users = {};
 
