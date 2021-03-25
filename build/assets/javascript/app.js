@@ -59,13 +59,14 @@ function setupEventHandlers() {
          if(e.target.id === "collapse-menu"){
 
             if(isMenuCollapsed) {
-               e.target.style.transform = "rotate(0deg)";
+               e.target.style.transform = "rotate(180deg)";
                headerEl.style.height = "46px";
             } else {
-               e.target.style.transform = "rotate(180deg)";
+               e.target.style.transform = "rotate(0deg)";
                headerEl.style.height = "20px";
             }
             isMenuCollapsed = !isMenuCollapsed;
+
          }
 
          // collapse window
@@ -90,20 +91,12 @@ function setupEventHandlers() {
                   osWindowProcess.send('collapse', windowState);
                   e.target.style.transform = "rotate(90deg)";
                   
-                  // collapse prefrences menu
-                  collapseMenuEl.style.transform = "rotate(180deg)";
-                  headerEl.style.height = "20px";
-                  isMenuCollapsed = true;
                   break;
                case "corner":
                   windowState = "initial";
                   osWindowProcess.send('collapse', windowState);
                   e.target.style.transform = "rotate(0deg)";
 
-                  // expand prefrences menu
-                  collapseMenuEl.style.transform = "rotate(0deg)";
-                  headerEl.style.height = "46px";
-                  isMenuCollapsed = false;
                   break;
                default: console.warning( "DEFAULTED switch on app.js:87")
 
@@ -240,6 +233,7 @@ function createUserEl(message) {
 function createReactions(message) {
    const reactionContainerEl = document.createElement("div");
    if (message.reactions && message.reactions.length > 0) {
+      reactionContainerEl.style.marginLeft = "20px";
       message.reactions.forEach((reaction) => {
          const reactionEl = document.createElement("div");
          reactionContainerEl.appendChild(reactionEl);
@@ -255,7 +249,29 @@ function createReactions(message) {
 function createCollapsThreadBtn() {
    const collapsThreadBtn = document.createElement("i");
    collapsThreadBtn.classList.add("fas","fa-chevron-circle-right") 
-   collapsThreadBtn.style.padding = "5px";
+   collapsThreadBtn.style.padding = "5px 5px 2px 2px";
+   collapsThreadBtn.style.position = "absolute";
+   collapsThreadBtn.style.zIndex = 5;
+
+   collapsThreadBtn.onclick =  e => {
+      // container.style.maxHeight = `calc(${container.firstElementChild.clientHeight}px + 24px)`;
+      e.stopPropagation();
+      console.log(e.target.parentElement)
+      const collapsed = e.target.parentElement.classList.contains("collapse"); 
+            if (collapsed){
+               e.target.parentElement.classList.remove("collapse")
+               e.target.parentElement.style.maxHeight = "2000px";
+               e.target.style.transform = "";
+
+               console.log( "notCollapsed")
+ 
+            } else {
+               e.target.parentElement.classList.add("collapse")
+               e.target.style.transform = "rotate(90deg)"
+               e.target.parentElement.style.maxHeight = `calc(${e.target.parentElement.firstElementChild.clientHeight}px + 20px)`;
+
+     }
+   }
    return collapsThreadBtn;
 }
 
@@ -286,8 +302,11 @@ function newMessage(message, isReply) {
 
    // reply style
    isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
-   isReply ? (messageContainerEl.style.marginLeft = "10px") : (messageContainerEl.style.marginTop = "20px");
+   isReply ? (messageContainerEl.style.margin = "10px 0px 0px 20px") : (messageContainerEl.style.margin = "0px 0px 10px 0px");
 
+   // isReply ? (messageContainerEl.style.display = "none") : (messageContainerEl.style.display = "block")
+
+   
    // files
    if (message.files)
       message.files.forEach(async (file) => messageContainerEl.appendChild(await newFile(file, rootThreads[message.thread_ts])));
@@ -295,10 +314,13 @@ function newMessage(message, isReply) {
    // get thread
    if (message.thread_ts && !rootThreads[message.thread_ts]) {
       messageContainerEl.appendChild(createCollapsThreadBtn());
+      messageContainerEl.classList.add("collapse")
+      messageContainerEl.style.transition =  "max-height 0.5s ease-in-out";
+
       getThread(message, messageContainerEl);
 
    }
-
+  
    // reaction
    messageContainerEl.appendChild(createReactions(message));
 
@@ -314,6 +336,10 @@ function getThread(message, container) {
       .then((completeThread) => {
          completeThread.messages.map((block) => {
             container.appendChild(newMessage(block, true));
+               container.classList.add("collapse");
+               console.log(container.firstElementChild)
+               container.style.maxHeight = `calc(${container.firstElementChild.clientHeight}px + 24px)`;
+               container.style.overflow = "hidden"
          });
          scrollToBottom();
       });

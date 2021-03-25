@@ -33,7 +33,7 @@ body {
 header {
 	position: fixed;
 	top: 5px;
-   height:46px;
+   height:20px;
 	right: 5px;
 	background-color: rgba(80, 19, 203, 0.645);
 	padding: 6px;
@@ -60,8 +60,9 @@ header {
 }
 
 .message-el{
+
    border : solid 1px #1cb7a2;
-   margin-top : 10px;
+   /* margin-top : 10px; */
    min-width: 200px;
    max-width: 500px;
    display : block;
@@ -70,13 +71,15 @@ header {
    border-radius : 2px;
    box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
    overflow-wrap: break-word;
+   overflow: hidden;
+
 }
 
 .bg-selection {
    cursor: pointer;
 }
 
-#collapse-menu {
+i {
    transition: all 0.3s ease-in;
 }
 
@@ -88,6 +91,9 @@ header {
    z-index: 2;
 }
 
+.collapse {
+    overflow: hidden;
+   }
 kbd {
    background-color: #eee;
    border-radius: 3px;
