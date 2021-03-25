@@ -1,5 +1,5 @@
 var osWindowProcess = require('electron').ipcRenderer;
-let isMenuCollapsed = false;
+let isMenuCollapsed = true;
 let windowState = localStorage.windowState || "corner";
 
 // api vars
@@ -147,12 +147,15 @@ function fetchHistory() {
    fetch(conversationHistoryEndPoint, slackOptions)
       .then((response) => response.json())
       .then((historyThread) => {
+         console.log(historyThread)
+         if (historyThread.messages)
          historyThread.messages.reverse().map(async (thread) => {
             if (thread.type === "message") {
                threadsEl.appendChild(newMessage(thread));
             }
          });
-      });
+      })
+      .then(scrollToBottom);
 }
 
 // ..fetch users
@@ -160,6 +163,7 @@ function fetchUsers() {
    return fetch(usersEndPoint, slackOptions)
       .then((response) => response.json())
       .then((usersList) => {
+         console.log({usersList})
          return usersList.members.reduce((members, current) => {
             return {
                ...members,
@@ -248,6 +252,13 @@ function createReactions(message) {
    return reactionContainerEl;
 }
 
+function createCollapsThreadBtn() {
+   const collapsThreadBtn = document.createElement("i");
+   collapsThreadBtn.classList.add("fas","fa-chevron-circle-right") 
+   collapsThreadBtn.style.padding = "5px";
+   return collapsThreadBtn;
+}
+
 // new message block
 function newMessage(message, isReply) {
    const messageContainerEl = document.createElement("div");
@@ -282,7 +293,11 @@ function newMessage(message, isReply) {
       message.files.forEach(async (file) => messageContainerEl.appendChild(await newFile(file, rootThreads[message.thread_ts])));
  
    // get thread
-   if (message.thread_ts && !rootThreads[message.thread_ts]) getThread(message, messageContainerEl);
+   if (message.thread_ts && !rootThreads[message.thread_ts]) {
+      messageContainerEl.appendChild(createCollapsThreadBtn());
+      getThread(message, messageContainerEl);
+
+   }
 
    // reaction
    messageContainerEl.appendChild(createReactions(message));
