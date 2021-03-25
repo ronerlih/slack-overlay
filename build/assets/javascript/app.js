@@ -120,7 +120,7 @@ function setupEventHandlers() {
    }
 
    // trigger last window mode
-   collapseWindowEl.click();
+   // collapseWindowEl.click();
 }
 
 // brightness slider
