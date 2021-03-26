@@ -1,3 +1,5 @@
+
+
 html {
 	scroll-behavior: smooth;
    overflow-x: hidden;
@@ -39,16 +41,20 @@ header {
 #mini-title{
    margin-top: 30px;
 }
+
 .img {
-   width: 50%;
    border-radius : 2px;
    margin-top : 10px;
    transition : all 0.15s ease-out;
    display : block;
    margin-left:14px;
-
+   max-width: 512px;
+   width: 100%;
+   transition: all 1 ease-in-out;
 }
-
+.zoom-in {
+   max-width: calc(100vw - 65px);
+}
 .messageWrap{
    display : inline-block;
    width : calc(100% - 50px);
@@ -78,7 +84,7 @@ header {
    cursor: pointer;
 }
 
-i {
+.fa-chevron-circle-right {
    transition: all 0.2s ease-in;
    transform-origin: 22px 13px;
 }

@@ -191,10 +191,11 @@ function createImg(image, isReply) {
    imgEl.onclick = function () {
       if (this.dataset.zoom === "false") {
          this.setAttribute("data-zoom", "true");
-         this.style.width = "calc(100% - 14px)";
+         this.classList.add('zoom-in')
+
       } else {
+         this.classList.remove('zoom-in')
          this.setAttribute("data-zoom", "false");
-         this.style.width = "50%";
       }
    };
 
@@ -238,7 +239,7 @@ function createReactions(message) {
       message.reactions.forEach((reaction) => {
          const reactionEl = document.createElement("div");
          reactionContainerEl.appendChild(reactionEl);
-         reactionEl.innerHTML = `${emojis[":" + reaction.name + ":"]} <span style="font-size:12px; margin-left:-5px;">${reaction.count}</span>`;
+         reactionEl.innerHTML = `${emojis[":" + reaction.name + ":"]} <span style="font-size:12px; margin-left:-4px; font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">${reaction.count}</span>`;
          reactionEl.style.display = "inline";
          reactionEl.style.color = "#5639caad";
          reactionEl.style.margin = "2px";
