@@ -191,7 +191,7 @@ function createImg(image, isReply) {
    imgEl.onclick = function () {
       if (this.dataset.zoom === "false") {
          this.setAttribute("data-zoom", "true");
-         this.style.width = "100%";
+         this.style.width = "calc(100% - 14px)";
       } else {
          this.setAttribute("data-zoom", "false");
          this.style.width = "50%";
@@ -234,13 +234,13 @@ function createUserEl(message) {
 function createReactions(message) {
    const reactionContainerEl = document.createElement("div");
    if (message.reactions && message.reactions.length > 0) {
-      reactionContainerEl.style.marginLeft = "20px";
+      reactionContainerEl.style.marginLeft = "32px";
       message.reactions.forEach((reaction) => {
          const reactionEl = document.createElement("div");
          reactionContainerEl.appendChild(reactionEl);
-
-         reactionEl.textContent = emojis[":" + reaction.name + ":"];
+         reactionEl.innerHTML = `${emojis[":" + reaction.name + ":"]} <span style="font-size:12px; margin-left:-5px;">${reaction.count}</span>`;
          reactionEl.style.display = "inline";
+         reactionEl.style.color = "#5639caad";
          reactionEl.style.margin = "2px";
       });
    }
@@ -250,8 +250,9 @@ function createReactions(message) {
 function createCollapsThreadBtn() {
    const collapsThreadBtn = document.createElement("i");
    collapsThreadBtn.classList.add("fas","fa-chevron-circle-right") 
-   collapsThreadBtn.style.padding = "5px 5px 2px 2px";
+   collapsThreadBtn.style.padding = "5px 5px 2px 14px";
    collapsThreadBtn.style.position = "absolute";
+   collapsThreadBtn.style.color = "#5639caad";
    collapsThreadBtn.style.zIndex = 5;
 
    collapsThreadBtn.onclick =  e => {
@@ -262,14 +263,15 @@ function createCollapsThreadBtn() {
             if (collapsed){
                console.log(e.target.parentElement)
                e.target.parentElement.classList.remove("collapse")
-               e.target.parentElement.style.maxHeight = `${e.target.parentElement.clientHeight}px`;
+               e.target.parentElement.style.maxHeight = `${e.target.parentElement.children.length * 100}px`;
                e.target.style.transform = "";
+               e.target.style.transform = "rotate(90deg)"
 
                console.log( "notCollapsed")
  
             } else {
                e.target.parentElement.classList.add("collapse")
-               e.target.style.transform = "rotate(90deg)"
+               e.target.style.transform = "rotate(0deg)"
                e.target.parentElement.style.maxHeight = `${e.target.parentElement.firstElementChild.clientHeight + MAX_HEIGHT_OFFSET}px`;
 
      }
@@ -301,9 +303,10 @@ function newMessage(message, isReply) {
    messageWrapEl.appendChild(userNameEl);
    messageWrapEl.appendChild(messageTextEl);
    messageEl.appendChild(messageWrapEl);
-
+   // 12b9c958
    // reply style
    isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
+   isReply ? (messageEl.style.backgroundColor = "#3950caad") : 0;
    isReply ? (messageContainerEl.style.margin = "20px 0px 0px 30px") : (messageContainerEl.style.margin = "80px 0px 10px 0px");
 
    // isReply ? (messageContainerEl.style.display = "none") : (messageContainerEl.style.display = "block")
@@ -339,9 +342,9 @@ function getThread(message, container) {
          completeThread.messages.map((block) => {
             container.appendChild(newMessage(block, true));
                container.classList.add("collapse");
-               console.log(container.firstElementChild)
+               container.style.transition = "max-height 0.5s cubic-bezier(0.99, 0.01, 0.01, 0.99) 0s";
+               container.style.overflow = "hidden";
                container.style.maxHeight = `${container.firstElementChild.clientHeight + MAX_HEIGHT_OFFSET}px`;
-               container.style.overflow = "hidden"
          });
          scrollToBottom();
       });
@@ -356,7 +359,7 @@ function setupSocketIO() {
       console.log(msg);
       if(msg.event.type === "message")
          threadsEl.appendChild(newMessage(msg.event));
-         
+
       scrollToBottom();
    });
 }
