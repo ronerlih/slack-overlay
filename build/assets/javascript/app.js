@@ -17,6 +17,7 @@ const headerEl = document.querySelector("header");
 const body = document.body;
 const bodyStyle = document.body.style;
 
+const MAX_HEIGHT_OFFSET = 38;
 // local vars
 let backgroundOpacity = 0.0;
 const rootThreads = {};
@@ -259,8 +260,9 @@ function createCollapsThreadBtn() {
       console.log(e.target.parentElement)
       const collapsed = e.target.parentElement.classList.contains("collapse"); 
             if (collapsed){
+               console.log(e.target.parentElement)
                e.target.parentElement.classList.remove("collapse")
-               e.target.parentElement.style.maxHeight = "2000px";
+               e.target.parentElement.style.maxHeight = `${e.target.parentElement.clientHeight}px`;
                e.target.style.transform = "";
 
                console.log( "notCollapsed")
@@ -268,7 +270,7 @@ function createCollapsThreadBtn() {
             } else {
                e.target.parentElement.classList.add("collapse")
                e.target.style.transform = "rotate(90deg)"
-               e.target.parentElement.style.maxHeight = `calc(${e.target.parentElement.firstElementChild.clientHeight}px + 20px)`;
+               e.target.parentElement.style.maxHeight = `${e.target.parentElement.firstElementChild.clientHeight + MAX_HEIGHT_OFFSET}px`;
 
      }
    }
@@ -302,7 +304,7 @@ function newMessage(message, isReply) {
 
    // reply style
    isReply ? (messageEl.style.border = "solid 1px #b213cb") : (messageEl.style.border = "solid 1px #1cb7a2");
-   isReply ? (messageContainerEl.style.margin = "10px 0px 0px 20px") : (messageContainerEl.style.margin = "0px 0px 10px 0px");
+   isReply ? (messageContainerEl.style.margin = "20px 0px 0px 30px") : (messageContainerEl.style.margin = "80px 0px 10px 0px");
 
    // isReply ? (messageContainerEl.style.display = "none") : (messageContainerEl.style.display = "block")
 
@@ -314,7 +316,7 @@ function newMessage(message, isReply) {
    // get thread
    if (message.thread_ts && !rootThreads[message.thread_ts]) {
       messageContainerEl.appendChild(createCollapsThreadBtn());
-      messageContainerEl.classList.add("collapse")
+      messageContainerEl.classList.add("collapse");
       messageContainerEl.style.transition =  "max-height 0.5s ease-in-out";
 
       getThread(message, messageContainerEl);
@@ -338,7 +340,7 @@ function getThread(message, container) {
             container.appendChild(newMessage(block, true));
                container.classList.add("collapse");
                console.log(container.firstElementChild)
-               container.style.maxHeight = `calc(${container.firstElementChild.clientHeight}px + 24px)`;
+               container.style.maxHeight = `${container.firstElementChild.clientHeight + MAX_HEIGHT_OFFSET}px`;
                container.style.overflow = "hidden"
          });
          scrollToBottom();
@@ -352,7 +354,9 @@ function setupSocketIO() {
    socket.on("connect", () => console.log("websocket conection"));
    socket.on("broadcast", async (msg) => {
       console.log(msg);
-      threadsEl.appendChild(newMessage(msg.event));
+      if(msg.event.type === "message")
+         threadsEl.appendChild(newMessage(msg.event));
+         
       scrollToBottom();
    });
 }

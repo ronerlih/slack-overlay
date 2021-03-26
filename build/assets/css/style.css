@@ -28,7 +28,6 @@ body {
 	/* background: rgba(0, 0, 0, 0.345); */
 	color: white;
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	margin: 10px;
 }
 header {
 	position: fixed;
@@ -68,13 +67,16 @@ header {
    display : block;
    background : #5639caad;
    padding : 5px;
+   margin-left:14px;
    border-radius : 2px;
-   box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+   box-shadow : 3px 6px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
    overflow-wrap: break-word;
    overflow: hidden;
 
 }
-
+.thread-base {
+   margin-top: 180px;
+}
 .bg-selection {
    cursor: pointer;
 }
@@ -107,7 +109,12 @@ kbd {
    padding: 2px 4px;
    white-space: nowrap;
   }
-
+.threads {
+   padding:20px
+}
+.thread-container{
+   padding: 20px;
+}
   #toggle-view {
      position: absolute;
      top:3px;
