@@ -108,18 +108,20 @@ function setupEventHandlers() {
          if (windowState === "swipped") {
                   windowState = "side";
                   osWindowProcess.send('collapse', windowState);
-                  collapseWindowEl.style.transform = "rotate(270deg)";
          }
 
       };
 
-      document.onkeypress = function (e) {
-         e = e || window.event;
-         if (e.key.toLowerCase() === "t")
-            collapseWindowEl.click();
-     };
    }
+   
+   document.onkeypress = function (e) {
+      e = e || window.event;
+      console.log(e)
+      if (e.key.toLowerCase() === "t"){
 
+         osWindowProcess.send('collapse', windowState);
+      }
+  };
    // trigger last window mode
    // collapseWindowEl.click();
 }

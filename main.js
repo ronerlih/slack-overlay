@@ -40,7 +40,7 @@ function createWindow() {
    } 
    else { 
       visiblePositioning = () => win.setPosition(width - SCREEN_WIDTH, 0, true);
-      hiddenPositioning = () => win.setSize(SCREEN_WIDTH, SCREEN_WIDTH, true);
+      hiddenPositioning = () => win.setPosition(width - 10, 0, true);
    }
       
 
