@@ -302,7 +302,29 @@ function newMessage(message, isReply) {
 
    // main div and text
    messageContainerEl.appendChild(messageEl);
-   messageTextEl.textContent = message.text;
+
+   // messageTextEl.textContent = message.text;
+
+   //remove '<', '>'
+   msgText = message.text.toString()
+   .replace(/\(\*<!channel>\*\)|<|>/g, '');
+
+   // bold
+   msgText = msgText.replace(/[\*].*?[\*]/gmi, str => {
+      str = str.slice(1, str.length - 1);
+      console.log(str)
+      str = "<strong>" + str + "</strong>";
+      return str;
+   } );
+   
+   // add emojis to body
+   msgText = msgText.toString().replace(/:[a-z]*_?[a-z]*_?[a-z]*:/gi, str => {
+      return emojis[str]
+   } );
+   
+   // console.log(msgText);
+   messageTextEl.style.fontSize = "16px"; 
+   messageTextEl.innerHTML = msgText;
    messageWrapEl.appendChild(userNameEl);
    messageWrapEl.appendChild(messageTextEl);
    messageEl.appendChild(messageWrapEl);

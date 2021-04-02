@@ -1,7 +1,7 @@
 require('dotenv').config({path:__dirname+'/build/.env'})
 
 const { app, BrowserWindow, screen, nativeImage, ipcMain } = require("electron");
-const SCREEN_WIDTH = 385;
+const SCREEN_WIDTH = 430;
 let visibility = true;
 
 function createWindow() { 
