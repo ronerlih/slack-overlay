@@ -308,6 +308,11 @@ function newMessage(message, isReply) {
    //remove '<', '>'
    msgText = message.text.toString()
    .replace(/\(\*<!channel>\*\)|<|>/g, '');
+  
+   msgText = msgText
+   .replace(
+`  `, '<br>').replace(`
+ `, '')
 
    // bold
    msgText = msgText.replace(/[\*].*?[\*]/gmi, str => {
@@ -317,6 +322,8 @@ function newMessage(message, isReply) {
       return str;
    } );
    
+   // drop line 
+
    // add emojis to body
    msgText = msgText.toString().replace(/:[a-z]*_?[a-z]*_?[a-z]*:/gi, str => {
       return emojis[str]
